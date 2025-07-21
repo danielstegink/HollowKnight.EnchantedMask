@@ -15,3 +15,5 @@ Each one will display its name, tier, and a description.
 If a glyph hasn't been unlocked, the description will provide a clue regarding how to unlock it.
 
 You can find a detailed list of each glyph, its abilities, and how to get it in the SPOILERS file.
+
+Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs from one's inventory.
