@@ -3,12 +3,8 @@ using EnchantedMask.Settings;
 using GlobalEnums;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
-using UnityEngine.TextCore;
-using UnityEngine.UIElements;
 
 namespace EnchantedMask.Glyphs
 {
@@ -170,7 +166,7 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Use Pythagorean to get distance between 2 objects
+        /// Uses Pythagorean to get distance between 2 objects
         /// </summary>
         /// <param name="enemy"></param>
         /// <param name="player"></param>

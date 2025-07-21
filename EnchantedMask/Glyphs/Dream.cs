@@ -1,5 +1,4 @@
 ﻿using EnchantedMask.Settings;
-using System;
 using System.Linq;
 using UnityEngine;
 
@@ -43,7 +42,7 @@ namespace EnchantedMask.Glyphs
         {
             base.Unequip();
 
-            On.EnemyDeathEffects.RecieveDeathEvent += GetEssence;
+            On.EnemyDeathEffects.RecieveDeathEvent -= GetEssence;
         }
 
         /// <summary>
@@ -74,14 +73,15 @@ namespace EnchantedMask.Glyphs
                 !BossSceneController.IsBossScene)
             {
                 int random = UnityEngine.Random.Range(1, 101);
-                if (random <= EssenceChance())
+                int essenceChance = EssenceChance();
+                //SharedData.Log($"{ID} - Checking Essence: {random} vs {essenceChance}");
+                if (random <= essenceChance)
                 {
                     GameObject dreamPrefab = SharedData.GetField<EnemyDeathEffects, GameObject>(self, "dreamEssenceCorpseGetPrefab");
                     dreamPrefab.Spawn(self.transform.position + self.effectOrigin);
 
-                    int essenceAmount = 10;
-                    PlayerData.instance.dreamOrbs += essenceAmount;
-                    PlayerData.instance.dreamOrbsSpent -= essenceAmount;
+                    PlayerData.instance.dreamOrbs++;
+                    PlayerData.instance.dreamOrbsSpent--;
                     EventRegister.SendEvent("DREAM ORB COLLECT");
                 }
             }
@@ -89,22 +89,39 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// Dream is an Uncommon glyph, so it's worth 2 notches.
-        /// Dream Wielder increases the chance by 50% for 1 notch,
-        ///     though this just 1 of its many effects.
-        /// Balancing for relative value, I'd say 2 notches is worth
-        ///     a 600% increase in the chance of gaining Essence.
         /// </summary>
         /// <returns></returns>
         private int EssenceChance()
         {
-            // By default, the chance of getting new essence is 1 in 300.
-            // So a 600% increase would be 200%, a statistical guarantee
-            //      of getting 2 essence per kill.
-            // But this kind of probability is boring, so let's spice things up.
-            // We have (1/300 + x) = 2, so x is 1.9967 which means there is a 
-            //      99% chance of getting 2 essence. But if we divide this by
-            //      5, it becomes a 20% chance of getting 10 Essence.
-            return 20;
+            // Dream Wielder increases the chance by 50% for 1 notch, though this just 1 of its many effects.
+            // It also significantly reduces Dream Nail charge time, which I would say is 50% of its value,
+            //      and increases the SOUL gained, which I would classify as 1/3 of its value.
+            // So, that leaves 1/6 of its value being extra Essence. Multiplying from 1/6 of a notch to 
+            //      2 full ones, we want to increase the chance of gaining Essence by 1200%
+
+            // There are 2 cases: for default we have a 1 in 300 chance of getting Essence, if we've spent
+            //      a lot of Essence we have a 1 in 60 chance.
+            // So, Dream Wielder gives a 50% boost, specifically converting the cases above to 1 in 200 and
+            //      1 in 40.
+            // So, 1/300 * 1.5 = 1/200 and 1/60 * 1.5 = 1/40
+            // In our case, we need to approximate 1/300 * 13 and 1/60 * 13, or 1/23.08 and 1/4.62
+
+            // So, our new equations are 1/300 + X = 7/300 and 1/60 + X = 7/60
+            // There isn't a mathematical approximation of this, but we know how to determine which case
+            //      to look for, so instead we solve for 1/300 + X = 13/300 and 1/60 + Y = 13/60
+            // X = 1/25, Y = 1/5
+
+            // So if PlayerData.instance.dreamOrbsSpent > 0, we want a 20% chance of getting Essence.
+            // Otherwise, we want a 4% chance.
+
+            if (PlayerData.instance.dreamOrbsSpent > 0)
+            {
+                return 20;
+            }
+            else
+            {
+                return 4;
+            }
         }
     }
 }

@@ -18,13 +18,23 @@ namespace EnchantedMask.Glyphs
 
         public override string GetClue()
         {
-            if (PlayerData.instance.royalCharmState != 4)
+            if (!PlayerData.instance.hasDreamNail)
             {
-                return "A dark truth remains hidden.";
+                return "The power of a forgotten tribe waits in the graveyard of heroes.";
+            }
+            else if (!PlayerData.instance.lurienDefeated ||
+                !PlayerData.instance.monomonDefeated ||
+                !PlayerData.instance.hegemolDefeated)
+            {
+                return "The Dreamers' seal holds strong.";
+            }
+            else if (PlayerData.instance.royalCharmState != 4)
+            {
+                return "A dark truth sleeps beneath the shells of your kin.";
             }
             else if (!PlayerData.instance.killedFinalBoss)
             {
-                return "The source of Infection hides in the knight's dreams.";
+                return "A great light hides in a knight's dreams.";
             }
 
             return base.GetClue();
@@ -59,17 +69,20 @@ namespace EnchantedMask.Glyphs
             HealthManager enemy = self.gameObject.GetComponent<HealthManager>();
             if (enemy != default)
             {
-                // Get the amount of essence we can spend
-                int essenceCount = GetEssence();
-                if (essenceCount > 0)
+                // Calculate the amount of damage to deal and how much Essence to use
+                int essenceSpent = GetEssence();
+                if (essenceSpent > 0)
                 {
                     // Calculate the damage
-                    int damage = (int)(essenceCount * GetModifier());
+                    float damagePerSoul = GetDamagePerSoul();
+                    float soulPerEssence = GetSoulPerEssence();
+                    float damage = damagePerSoul * soulPerEssence * (float)essenceSpent;
+                    int damageInt = (int)Math.Round(damage);
 
                     // Set up a spell attack
                     HitInstance dreamHit = new HitInstance
                     {
-                        DamageDealt = damage,
+                        DamageDealt = damageInt,
                         AttackType = AttackTypes.Spell,
                         IgnoreInvulnerable = true,
                         Source = HeroController.instance.gameObject,
@@ -78,15 +91,53 @@ namespace EnchantedMask.Glyphs
 
                     // Deal the damage
                     enemy.Hit(dreamHit);
-                    //SharedData.Log($"{ID} - {damage} dealt from {essenceCount} Essence");
+                    //SharedData.Log($"{ID} - {damageInt} damage dealt for {essenceSpent} Essence");
 
                     // Remove the essence from our inventory and add them as 
                     // essence spent so the game knows to increase the chance of 
                     // us getting more
-                    PlayerData.instance.dreamOrbs -= essenceCount;
-                    PlayerData.instance.dreamOrbsSpent += essenceCount;
+                    PlayerData.instance.dreamOrbs -= essenceSpent;
+                    PlayerData.instance.dreamOrbsSpent += essenceSpent;
                 }
             }
+        }
+
+        /// <summary>
+        /// Radiant effectively adds a spell cast to the Dream Nail,
+        ///     so we need to pick a spell and calculate damage based
+        ///     on it.
+        /// </summary>
+        /// <returns></returns>
+        internal float GetDamagePerSoul()
+        {
+            // DN has short range and a long cast time. So of all 
+            //      the spells, it is most similar to Abyss Shriek.
+            // Abyss Shriek creates 4 bursts, so we can Radiant
+            //      as a single burst at 1/4 the regular SOUL cost.
+            float baseDamage = 20f;
+            float soulCost = 33f / 4f;
+
+            return baseDamage / soulCost;
+        }
+
+        /// <summary>
+        /// Determines how much SOUL 1 Essence is worth
+        /// </summary>
+        /// <returns></returns>
+        private float GetSoulPerEssence()
+        {
+            // Normally the user gets 11 SOUL per nail attack. Assuming the enemy can survive
+            //      3 nail attacks (about 60 HP w/ Pure Nail), thats 33 SOUL per enemy.
+            // In comparison, Essence has a drop rate of 1 per 300 enemes. Now, this glyph
+            //      will result in us spending a lot of Essence, so the ratio will increase to
+            //      1 per 60 enemies.
+            // On paper, this makes it very valuable. However, we use SOUL constantly and 
+            //      use Essence practically never, so it makes sense to seriously adjust
+            //      the value.
+            // I'm thinking Essence should be only 1% as valuable, since we only ever use it for
+            //      Dream Gates.
+            // 33 * 60 / 100 = 19.8
+            return 19.8f;
         }
 
         /// <summary>
@@ -95,77 +146,37 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         private int GetEssence()
         {
-            // Radiant is an Epic glyph, making it worth 4 notches.
-            // If this were a nail attack, that would be a 40% increase in damage.
-            // However, need to consider how many nail attacks a Dream Nail is worth.
-            // Dream Nail takes 1.75 seconds to attack and generates 33 SOUL, which is
-            //      18.86 SOUL per second.
-            // Pure Nail takes 0.41 seconds to deal 21 damage and gain 11 SOUL, which is
-            //      26.83 SOUL and 51.22 damage per second.
-            // It's moments like this that really drive home the fact that Dream Nail is
-            //      only meant to be used against staggered enemies.
-            // 33 / 1.75
+            // Radiant uses Essence to deal extra damage when it 
+            //      normally wouldn't deal any.
+            // So, how much SOUL would we spend for 1 notch?
+            // DN is like a Nail Art, so we're adding a Spell to a
+            //      Nail Art, doubling our DPS.
+            // A 3-notch charm like Shaman Stone or Quick Slash increases
+            //      DPS by 40%, and casting an extra spell would be like
+            //      adding 100%, which would be worth 7.5 notches.
+            // However, Dream Nail and Nail Arts are difficult to pull off.
+            //      Spells and regular Nail attacks take about 0.41 seconds
+            //      to trigger, while Dream Nail takes 1.75 seconds, 426.82%
+            //      as long.
+            // So, if we factor in that the spell is spread out over a much
+            //      longer period of time, it actually becomes worth about
+            //      1.75 notches
+            // Radiant is an Epic glyph, making it worth 4 notches. So
+            //      Radiant should cast 227% of a spell
+            float spellsPerDreamNail = 1.75f / 0.41f;
+            float notchesPerSpell = 7.5f / spellsPerDreamNail;
+            float baseSoul = 33f;
+            float totalSoul = baseSoul * 4f / notchesPerSpell;
+            //SharedData.Log($"{ID} - Total SOUL spent: {totalSoul}");
 
-            // Soul Catcher increases SOUL from nail strikes by 3 for 2 notches, and
-            //      Soul Eater increases it by 8 for 4 notches, which means 1 notch is
-            //      worth about 1.75 SOUL per nail strike, or 4.27 SOUL per second.
-            // Per my own logic regarding Fragile Strength, 1 notch is worth a 10%
-            //      increase in nail damage, or 5.12 damage per second.
-            //  So 1 SOUL is worth 1.2 damage.
-            // 5.122 / (1.75 / 0.41)
+            // Finally, calculate the total essence based on the total SOUL
+            float soulPerEssence = GetSoulPerEssence();
+            float maxEssence = totalSoul / soulPerEssence;
+            //SharedData.Log($"{ID} - Max essence: {maxEssence}");
 
-            // We've been treating Dream Nail like a nail attack due to its range so far,
-            //      but since we're going to spend Essence like SOUL to power it, we need
-            //      to treat Dream Nail like a spell. 
-            // The spell most like Dream Nail is Abyss Shriek due to its short range and
-            //      lack of i-frames.
-            // Shaman Stone increases its damage by about 50%, but Shaman Stone affects
-            //      all spells.
-            // Flukenest increases only fireball spells, and increases their damage by
-            //      roughly 100% for 3 notches.
-            // It also deserves noting that Quick Slash increases nail speed by
-            //      39%, which affects both its damage and its SOUL gain.
-
-            // So, we have a nail-like attack that needs a spell-like damage boost.
-            // Dream Nail doesn't do damage, but it does do 18.86 SOUL per second, which
-            //      approximates to 22.63 damage per second.
-            // So at 4 notches, with a boost of 33% per notch, Radiant should give
-            //      Dream Nail an extra 30.17 damage per second, which equates to
-            //      52.8 damage per swing.
-
-            // Per below, 1 Essence is worth 12 damage, so the closest value is
-            //      48 in exchange for 4 Essence.
-            // Of course, we won't spend Essence we don't have.
-            return Math.Min(4, PlayerData.instance.dreamOrbs);
-        }
-
-        /// <summary>
-        /// Determines how much damage the player can deal in 
-        /// exchange for 1 Essence
-        /// </summary>
-        /// <returns></returns>
-        internal override float GetModifier()
-        {
-            // Since we are treating Essence as a disposable resource like SOUL, it makes
-            //      sense to calculate the damage like a Spell.
-            // Level 2 Fireball (Shade Soul) deals 30 damage for 33 SOUL.
-            float damagePerSoul = 30f/33f;
-
-            // Now to calculate how valuable Essence is compared to SOUL.
-            // Normally the user gets 11 SOUL per nail attack. Assuming the enemy being
-            //      attacked can survive 2 nail attacks, thats about 22 SOUL per enemy.
-            // In comparison, Essence has a drop rate of 1 per 300 enemes. Now, this glyph
-            //      will result in us spending a lot of Essence, and in that scenario, the 
-            //      ratio will increase to 1 per 60 enemies.
-            // On paper, this makes it very valuable. However, we use SOUL constantly and 
-            //      use Essence practically never, so it makes sense to seriously adjust
-            //      the value.
-            // I'm thinking Essence should be only 1% as valuable, since we only ever use it for
-            //      Dream Gates.
-            float soulPerEssence = 22f * 60f / 100f;
-
-            // So under this new logic, 1 Essence should be worth about 12 damage.
-            return damagePerSoul * soulPerEssence;
+            // Remember to check how much Essence we actually have to spend
+            int maxEssenceInt = (int)Math.Round(maxEssence);
+            return Math.Min(maxEssenceInt, PlayerData.instance.dreamOrbs);
         }
     }
 }

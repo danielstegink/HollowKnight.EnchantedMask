@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Settings;
-using Modding;
+﻿using Modding;
 using UnityEngine;
 
 namespace EnchantedMask.Glyphs
@@ -19,7 +18,11 @@ namespace EnchantedMask.Glyphs
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.hegemolDefeated)
+            if (!PlayerData.instance.hasDreamNail)
+            {
+                return "The power of a forgotten tribe waits in the graveyard of heroes.";
+            }
+            else if (!PlayerData.instance.hegemolDefeated)
             {
                 return "The Beast sleeps in the depths of her Den.";
             }
@@ -43,8 +46,8 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// The Beast glyph is Uncommon, so its worth 2 notches. 
-        /// Weaversong is a 1 notch charm, so we can justify
-        ///     tripling the number of weaverlings.
+        /// Weaversong is a 2 notch charm, so we can justify 
+        ///     doubling the number of weaverlings.
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns></returns>
@@ -53,10 +56,6 @@ namespace EnchantedMask.Glyphs
             if (gameObject.name.Contains("Weaverling") &&
                 PlayerData.instance.equippedCharm_39)
             {
-                _ = GameObject.Instantiate(gameObject,
-                    new Vector3(HeroController.instance.transform.GetPositionX(),
-                    HeroController.instance.transform.GetPositionY()),
-                    Quaternion.identity);
                 _ = GameObject.Instantiate(gameObject,
                     new Vector3(HeroController.instance.transform.GetPositionX(),
                     HeroController.instance.transform.GetPositionY()),

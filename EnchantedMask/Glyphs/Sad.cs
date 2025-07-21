@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Settings;
-using System;
+﻿using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -20,7 +19,7 @@ namespace EnchantedMask.Glyphs
         {
             if (!PlayerData.instance.xunRewardGiven)
             {
-                return "The mournful one waits with a flower in hand.";
+                return "A mournful knight sits with a flower in hand.";
             }
 
             return base.GetClue();

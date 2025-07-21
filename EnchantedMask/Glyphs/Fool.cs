@@ -15,9 +15,13 @@
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.colosseumGoldCompleted)
+            if (!PlayerData.instance.littleFoolMet)
             {
-                return "The greatest Fool waits at the end of three trials.";
+                return "There is a place where Fools gather for death and glory.";
+            }
+            else if (!PlayerData.instance.colosseumGoldCompleted)
+            {
+                return "A great Fool waits at the end of three trials.";
             }
 
             return base.GetClue();

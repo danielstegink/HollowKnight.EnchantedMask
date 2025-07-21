@@ -1,6 +1,6 @@
 ﻿using EnchantedMask.Settings;
 using GlobalEnums;
-using Modding;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -38,14 +38,14 @@ namespace EnchantedMask.Glyphs
             base.Equip();
 
             InitializeWebShield();
-            ModHooks.TakeHealthHook += WebBlock;
+            On.HeroController.TakeDamage += WebBlock;
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            ModHooks.TakeHealthHook -= WebBlock;
+            On.HeroController.TakeDamage -= WebBlock;
         }
 
         #region Define Web prefab
@@ -74,27 +74,45 @@ namespace EnchantedMask.Glyphs
         }
         #endregion
 
-        #region Spawn Web
+        #region Damage Block & Spawn Web
+        /// <summary>
+        /// Checks if the player is currently immune to damage
+        /// </summary>
+        private bool isImmune = false;
+
         /// <summary>
         /// The Hornet glyph has a chance to produce a web that negates damage
         /// </summary>
-        /// <param name="damage"></param>
-        /// <returns></returns>
-        /// <exception cref="NotImplementedException"></exception>
-        private int WebBlock(int damage)
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="go"></param>
+        /// <param name="damageSide"></param>
+        /// <param name="damageAmount"></param>
+        /// <param name="hazardType"></param>
+        private void WebBlock(On.HeroController.orig_TakeDamage orig, HeroController self, GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
-            if (damage > 0)
+            if (CanTakeDamage(hazardType) && 
+                damageAmount > 0)
             {
-                int random = UnityEngine.Random.Range(1, 101);
-                //SharedData.Log($"{ID} - Attempting to block: {random}");
-                if (random <= BlockChance())
+                // Check if currently immune
+                if (isImmune)
                 {
-                    GameManager.instance.StartCoroutine(SpawnWeb());
-                    damage = 0;
+                    damageAmount = 0;
+                }
+                else // Otherwise, run the numbers
+                {
+                    int random = UnityEngine.Random.Range(1, 101);
+                    //SharedData.Log($"{ID} - Attempting to block: {random}");
+                    if (random <= BlockChance())
+                    {
+                        damageAmount = 0;
+                        isImmune = true;
+                        GameManager.instance.StartCoroutine(SpawnWeb());
+                    }
                 }
             }
 
-            return damage;
+            orig(self, go, damageSide, damageAmount, hazardType);
         }
 
         /// <summary>
@@ -107,7 +125,9 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Spawns a Hornet web around the player
+        /// Spawns a Hornet web around the player. Also ensures the player gets 1 second
+        /// of immunity before they start taking damage again. That way they don't 
+        /// keep taking damage from an enemy they're in contact with
         /// </summary>
         /// <exception cref="NotImplementedException"></exception>
         private IEnumerator SpawnWeb()
@@ -118,6 +138,7 @@ namespace EnchantedMask.Glyphs
 
             yield return new WaitForSeconds(1f);
             UnityEngine.GameObject.Destroy(web);
+            isImmune = false;
         }
         #endregion
     }

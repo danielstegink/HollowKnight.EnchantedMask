@@ -1,7 +1,4 @@
-﻿using EnchantedMask.Settings;
-using HutongGames.PlayMaker.Actions;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -22,11 +19,11 @@ namespace EnchantedMask.Glyphs
         {
             if (!PlayerData.instance.hasKingsBrand)
             {
-                return "The key to darkness waits beyond the kingdom's reach.";
+                return "The King's legacy waits beyond the kingdom's reach.";
             }
             else if (!PlayerData.instance.gotCharm_9)
             {
-                return "The living essence of lifeblood hides among corpses.";
+                return "The living essence of lifeblood behind a forgotten seal.";
             }
 
             return base.GetClue();

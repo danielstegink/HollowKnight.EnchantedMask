@@ -1,7 +1,4 @@
-﻿using EnchantedMask.Settings;
-using System;
-
-namespace EnchantedMask.Glyphs
+﻿namespace EnchantedMask.Glyphs
 {
     public class Sibling : Glyph
     {
@@ -20,7 +17,7 @@ namespace EnchantedMask.Glyphs
         {
             if (!PlayerData.instance.hasKingsBrand)
             {
-                return "The key to darkness waits beyond the kingdom's reach.";
+                return "The King's legacy waits beyond the kingdom's reach.";
             }
             else if (!PlayerData.instance.gotQueenFragment || 
                         !PlayerData.instance.gotKingFragment)

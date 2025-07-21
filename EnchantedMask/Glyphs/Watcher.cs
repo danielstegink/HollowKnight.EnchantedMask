@@ -1,11 +1,7 @@
 ﻿using EnchantedMask.Helpers;
 using EnchantedMask.Settings;
-using HutongGames.PlayMaker;
 using Modding;
-using Satchel.Futils;
-using SFCore.Utils;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace EnchantedMask.Glyphs
@@ -25,7 +21,11 @@ namespace EnchantedMask.Glyphs
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.lurienDefeated)
+            if (!PlayerData.instance.hasDreamNail)
+            {
+                return "The power of a forgotten tribe waits in the graveyard of heroes.";
+            }
+            else if (!PlayerData.instance.lurienDefeated)
             {
                 return "The Watcher dreams from atop his Spire.";
             }

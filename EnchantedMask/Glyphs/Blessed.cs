@@ -1,6 +1,4 @@
-﻿using EnchantedMask.Settings;
-
-namespace EnchantedMask.Glyphs
+﻿namespace EnchantedMask.Glyphs
 {
     public class Blessed : Glyph
     {
@@ -59,6 +57,8 @@ namespace EnchantedMask.Glyphs
         /// The Blessed glyph adds charm notches.
         /// Blessed is a Common glyph worth 1 notch, so 
         ///     it gives 1 notch.
+        /// When unequipping the glyph, we need a way
+        ///     to confirm that we've added a notch.
         /// </summary>
         private bool applied = false;
     }

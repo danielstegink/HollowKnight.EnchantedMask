@@ -63,7 +63,7 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// As a Common glyph, the CDash should be equivalent to a 1-notch charm.
+        /// As a Common glyph, Crystal should be equivalent to a 1-notch charm.
         /// This would be worth a 10% increase in nail damage. However, CDash is a 
         ///     very niche attack, so I'm comfortable going much higher.
         /// </summary>

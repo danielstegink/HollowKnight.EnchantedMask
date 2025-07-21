@@ -93,7 +93,7 @@ namespace EnchantedMask.Helpers
                         // all changes should be cleared out
 
                         // However, Dung Cloud has different bases depending on if the player has 
-                        // Shaman Stone equipped, so the old base and stored base may be different. In this'
+                        // Shaman Stone equipped, so the old base and stored base may be different. In this
                         // case, we want to reset and redo the buffs
                         if (interval != modsApplied.baseValue)
                         {

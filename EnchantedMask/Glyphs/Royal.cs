@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Settings;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace EnchantedMask.Glyphs
@@ -64,7 +63,7 @@ namespace EnchantedMask.Glyphs
             int damageAmount, int hazardType)
         {
             // Confirm that damage was taken and the damage type wasn't Enemies (1)
-            if (damageAmount > 0 &&
+            if (CanTakeDamage(hazardType) &&
                 hazardType != 1)
             {
                 // Check if currently immune
@@ -102,9 +101,9 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Unlike enemy attacks, the player could potentially end up getting damaged 
-        /// immediately after ignoring damage due to collision rules. So, the player will
-        /// get 1 second of immunity to escape to safety.
+        /// The player could potentially end up getting damaged immediately after 
+        /// ignoring damage due to collision rules. So, the player will get 1 second 
+        /// of immunity to escape to safety.
         /// </summary>
         /// <returns></returns>
         private IEnumerator StayImmune()

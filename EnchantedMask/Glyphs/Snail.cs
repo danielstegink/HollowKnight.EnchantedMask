@@ -31,7 +31,7 @@ namespace EnchantedMask.Glyphs
             }
             else if (PlayerData.instance.quakeLevel < 2)
             {
-                return "A shaman's remains lie trapped in stone";
+                return "A shaman's remains lie trapped in crystal.";
             }
             else if (!PlayerData.instance.gotCharm_21)
             {
@@ -57,21 +57,13 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            isActive = true;
             GameManager.instance.StartCoroutine(GiveSoul());
         }
 
         public override void Unequip()
         {
             base.Unequip();
-
-            isActive = false;
         }
-
-        /// <summary>
-        /// Tracks if the glyph is active
-        /// </summary>
-        private bool isActive = false;
 
         /// <summary>
         /// The Snail glyph gives passive SOUL regeneration, like Kingsoul.
@@ -82,7 +74,7 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         private IEnumerator GiveSoul()
         {
-            while (isActive)
+            while (IsEquipped())
             {
                 HeroController.instance.AddMPCharge(1);
                 yield return new WaitForSeconds(1.25f);

@@ -23,7 +23,11 @@ namespace EnchantedMask.Glyphs
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.lurienDefeated || 
+            if (!PlayerData.instance.hasDreamNail)
+            {
+                return "The power of a forgotten tribe waits in the graveyard of heroes.";
+            }
+            else if (!PlayerData.instance.lurienDefeated || 
                 !PlayerData.instance.monomonDefeated || 
                 !PlayerData.instance.hegemolDefeated)
             {
@@ -67,7 +71,8 @@ namespace EnchantedMask.Glyphs
         /// <param name="hazardType"></param>
         private void SelfStab(On.HeroController.orig_TakeDamage orig, HeroController self, GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
-            if (damageAmount > 0)
+            if (CanTakeDamage(hazardType) && 
+                damageAmount > 0)
             {
                 if (isImmune)
                 {

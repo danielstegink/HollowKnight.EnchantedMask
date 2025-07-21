@@ -1,12 +1,11 @@
-﻿using EnchantedMask.Settings;
-using GlobalEnums;
+﻿using GlobalEnums;
 using UnityEngine;
 
 namespace EnchantedMask.Helpers
 {
     /// <summary>
     /// Lumafly Damage is the damage component for the lumafly swarm from the
-    /// Teacher glyph.
+    ///     Teacher glyph.
     /// The Teacher is an Uncommon glyph, making it worth 2 notches. So it should
     ///     do twice as much damage per second as Defender's Crest.
     /// </summary>

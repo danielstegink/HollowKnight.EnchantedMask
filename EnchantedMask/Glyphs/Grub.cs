@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Settings;
-using GlobalEnums;
+﻿using GlobalEnums;
 using System;
 using UnityEngine;
 
@@ -26,7 +25,7 @@ namespace EnchantedMask.Glyphs
             }
             else if (PlayerData.instance.grubsCollected < 46)
             {
-                return "There are still children trapped in the kingdom.";
+                return "There are more children trapped throughout the kingdom.";
             }
             else if (!PlayerData.instance.finalGrubRewardCollected)
             {

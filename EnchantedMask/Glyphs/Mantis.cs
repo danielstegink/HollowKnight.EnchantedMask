@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Settings;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace EnchantedMask.Glyphs
 {

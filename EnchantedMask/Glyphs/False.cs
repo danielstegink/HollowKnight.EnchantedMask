@@ -77,8 +77,8 @@ namespace EnchantedMask.Glyphs
             }
 
             // The FSM will have 2 values of note: Stun Combo and Stun Hit Max. Both need to be reduced
-            stunFsm.FsmVariables.FindFsmInt("Stun Hit Max").Value -= 1;
-            stunFsm.FsmVariables.FindFsmInt("Stun Combo").Value -= 1;
+            stunFsm.FsmVariables.FindFsmInt("Stun Hit Max").Value--;
+            stunFsm.FsmVariables.FindFsmInt("Stun Combo").Value--;
 
             return isAlreadyDead;
         }

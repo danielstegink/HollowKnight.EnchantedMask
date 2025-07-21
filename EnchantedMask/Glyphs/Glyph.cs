@@ -1,5 +1,6 @@
 ﻿using EnchantedMask.Helpers.UI;
 using EnchantedMask.Settings;
+using GlobalEnums;
 using System;
 using UnityEngine;
 
@@ -166,6 +167,38 @@ namespace EnchantedMask.Glyphs
         internal virtual int GetBonus(int baseValue)
         {
             return (int)Math.Max(1, baseValue * GetModifier());
+        }
+
+        /// <summary>
+        /// Determines if the player can take damage
+        /// </summary>
+        /// <param name="hazardType"></param>
+        /// <returns></returns>
+        internal bool CanTakeDamage(int hazardType)
+        {
+            // Damage is calculated by the HeroController's TakeDamage method
+            // First, run the CanTakeDamage check from the HeroController
+            bool canTakeDamage = SharedData.CallFunction<HeroController, bool>(HeroController.instance, "CanTakeDamage", null);
+            if (canTakeDamage)
+            {
+                // There is an additional check for I-Frames and shadow dashing
+                if (hazardType == 1)
+                {
+                    if (HeroController.instance.damageMode == DamageMode.HAZARD_ONLY ||
+                        HeroController.instance.cState.shadowDashing ||
+                        HeroController.instance.parryInvulnTimer > 0f)
+                    {
+                        canTakeDamage = false;
+                    }
+                }
+                else if (HeroController.instance.cState.invulnerable ||
+                            PlayerData.instance.isInvincible)
+                {
+                    canTakeDamage = false;
+                }
+            }
+
+            return canTakeDamage;
         }
     }
 }

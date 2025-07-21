@@ -1,6 +1,4 @@
-﻿using EnchantedMask.Settings;
-
-namespace EnchantedMask.Glyphs
+﻿namespace EnchantedMask.Glyphs
 {
     public class Old : Glyph
     {
@@ -17,7 +15,11 @@ namespace EnchantedMask.Glyphs
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.elderbugGaveFlower)
+            if (!PlayerData.instance.xunFlowerGiven)
+            {
+                return "A mournful knight sits with a flower in hand.";
+            }
+            else if (!PlayerData.instance.elderbugGaveFlower)
             {
                 return "A great elder unknowingly waits for a gift.";
             }

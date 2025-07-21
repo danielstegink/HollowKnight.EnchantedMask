@@ -17,7 +17,7 @@
         {
             if (!PlayerData.instance.corniferAtHome)
             {
-                return "The mapmaker continues to his journey.";
+                return "A mapmaker continues his journey across the kingdom.";
             }
             else if (!PlayerData.instance.mapAllRooms)
             {

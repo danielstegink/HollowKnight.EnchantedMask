@@ -23,7 +23,11 @@ namespace EnchantedMask.Glyphs
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.monomonDefeated)
+            if (!PlayerData.instance.hasDreamNail)
+            {
+                return "The power of a forgotten tribe waits in the graveyard of heroes.";
+            }
+            else if (!PlayerData.instance.monomonDefeated)
             {
                 return "The Teacher rests deep within her Archives.";
             }
@@ -35,7 +39,6 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            isActive = true;
             CreatePrefab();
             GameManager.instance.StartCoroutine(SpawnLumaflies());
         }
@@ -43,14 +46,7 @@ namespace EnchantedMask.Glyphs
         public override void Unequip()
         {
             base.Unequip();
-
-            isActive = false;
         }
-
-        /// <summary>
-        /// Tracks if the swarms should keep spawning
-        /// </summary>
-        private bool isActive = false;
 
         /// <summary>
         /// Stores custom lumafly swarm
@@ -83,7 +79,7 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         private IEnumerator SpawnLumaflies()
         {
-            while (isActive)
+            while (IsEquipped())
             {
                 GameObject swarm = UnityEngine.GameObject.Instantiate(prefab, HeroController.instance.transform.position, Quaternion.identity);
                 swarm.SetActive(true);

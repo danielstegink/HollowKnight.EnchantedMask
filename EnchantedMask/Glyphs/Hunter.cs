@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Settings;
-using System;
+﻿using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -20,7 +19,7 @@ namespace EnchantedMask.Glyphs
         {
             if (!PlayerData.instance.hasJournal)
             {
-                return "The Hunter waits to offer you a quest.";
+                return "A veteran hunter waits to offer you a quest.";
             }
             else if (!PlayerData.instance.hasHuntersMark)
             {

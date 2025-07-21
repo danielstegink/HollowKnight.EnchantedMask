@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Settings;
-using System;
+﻿using System;
 
 namespace EnchantedMask.Glyphs
 {
