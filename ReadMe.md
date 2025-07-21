@@ -17,3 +17,14 @@ If a glyph hasn't been unlocked, the description will provide a clue regarding h
 You can find a detailed list of each glyph, its abilities, and how to get it in the SPOILERS file.
 
 Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs from one's inventory.
+
+## Patch Notes
+1.0.1.0
+- Rebalanced Beast to double Weaverlings instead of tripling them
+- Fixed Dream to stop giving Essence when unequipped
+- Rebalanced Dream to give Essence less often
+- Modified Hornet to check if the player can even take damage, and to give 1 second of immunity when triggered
+- Rebalanced Radiant to deal more damage
+- Modified Royal to perform the same "Can Take Damage" check as Hornet
+- Modified Snail and Teacher to check if the glyph is equipped, rather than track active status via variable
+-	Modified clues to be more descriptive while keeping some mystery
