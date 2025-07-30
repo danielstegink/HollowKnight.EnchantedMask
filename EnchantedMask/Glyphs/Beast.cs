@@ -9,7 +9,7 @@ namespace EnchantedMask.Glyphs
         public override string Name => "Glyph of the Beast";
         public override Tiers Tier => Tiers.Uncommon;
         public override string Description => "The symbol of the ruler of the Weaver tribe.\n\n" +
-                                                "Increases the bearer's affinity with Weavers.";
+                                                "Increases the bearer's affinity with the Weavers.";
 
         public override bool Unlocked()
         {
@@ -53,8 +53,7 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         private GameObject SpawnWeaverlings(GameObject gameObject)
         {
-            if (gameObject.name.Contains("Weaverling") &&
-                PlayerData.instance.equippedCharm_39)
+            if (gameObject.name.Contains("Weaverling"))
             {
                 _ = GameObject.Instantiate(gameObject,
                     new Vector3(HeroController.instance.transform.GetPositionX(),

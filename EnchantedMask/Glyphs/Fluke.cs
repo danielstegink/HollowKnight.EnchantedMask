@@ -32,7 +32,11 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            dungFlukeHelper = new DungFlukeHelper(1 - GetModifier());
+            // d/t = r
+            // To buff dung flukes, we adjust t
+            // d/(xt) = 1.67 * r
+            // x = 1 / 1.67
+            dungFlukeHelper = new DungFlukeHelper(1 / (1 + GetModifier()), Name);
             dungFlukeHelper.Start();
             ModHooks.ObjectPoolSpawnHook += BuffFlukes;
         }
@@ -83,13 +87,12 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// As an Uncommon glyph, Fluke is worth 2 notches.
-        /// Per Shaman Stone, this would normally be worth a 30% increase.
-        /// However, it only boosts 1 spell, so we can increase the boost.
+        /// Flukenest uses 3 notches to do what it does, so Fluke should increase its damage by about 67%.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.4f;
+            return 2f / 3f;
         }
     }
 }

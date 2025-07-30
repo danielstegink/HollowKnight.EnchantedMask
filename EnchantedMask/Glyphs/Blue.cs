@@ -59,6 +59,8 @@ namespace EnchantedMask.Glyphs
             {
                 EventRegister.SendEvent("ADD BLUE HEALTH");
             }
+
+            orig(self, amount);
         }
 
         /// <summary>
@@ -84,7 +86,7 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         internal int GetHealChance()
         {
-            int healChance = 35;
+            int healChance = 34;
 
             if (PlayerData.instance.equippedCharm_8)
             {

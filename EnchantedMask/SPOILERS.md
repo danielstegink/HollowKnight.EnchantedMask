@@ -33,7 +33,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
  - Reduces Dash and Shadow Dash cooldowns
 
 ## Glyph of Love
- - Common
+ - Uncommon
  - Unlocked by earning Salubra's Blessing
  - Increases charm notches
 
@@ -50,12 +50,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Honour
  - Uncommon
  - Unlocked by defeating the Dung Defender
- - Increases damage dealt by Defender's Crest
-
-## Glyph of Motherhood
- - Uncommon
- - Unlocked by defeating the Flukemarm
- - Increases damage dealt by Flukenest
+ - Increases size of clouds created by Defender's Crest
 
 ## Glyph of Crystals
  - Common
@@ -65,7 +60,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Dreams
  - Uncommon
  - Unlocked by listening to the Seer's last words
- - Increases chance of gaining Essence
+ - Dream Nail deals damage in exchange for Essence
 
 ## Glyph of Greed
  - Common
@@ -75,7 +70,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Broken Glyph
  - Uncommon
  - Unlocked by defeating the Broken Vessel
- - Adds an extra jump to Monarch Wings
+ - Adds extra jumps to Monarch Wings
 
 ## Glyph of the Nail
  - Uncommon
@@ -92,6 +87,11 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
  - Unlocked by earning Lifeblood Core
  - Chance to get lifeblood masks after healing
 
+## Glyph of Motherhood
+ - Uncommon
+ - Unlocked by defeating the Flukemarm
+ - Increases damage dealt by Flukenest
+
 ## Glyph of the Watcher
  - Uncommon
  - Unlocked by defeating Lurien
@@ -100,17 +100,17 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of the Teacher
  - Uncommon
  - Unlocked by defeating Monomon
- - Spawns lumaflies that damage nearby enemies
+ - Spawns lumaflies that damage the nearest enemy
 
 ## Glyph of the Beast
  - Uncommon
  - Unlocked by defeating Herrah
- - Weaversong spawns more weaverlings
+ - Increases the number of weaverlings spawned by Weaversong
 
 ## Glyph of Sacrifice
  - Epic
  - Unlocked by defeating the Hollow Knight
- - After taking damage, become immune to damage for a short time
+ - Gives immunity for a short time after taking damage
 
 ## Glyph of Unn
  - Common
@@ -124,7 +124,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 
 ## Glyph of Betrayal / Glyph of Warriors
  - Rare
- - Unlocked by defeating Traitor Lord. Defeating him with Cloth's help unlocks Glyph of Warriors
+ - Unlocked by defeating Traitor Lord. Defeating him with Cloth unlocks Glyph of Warriors.
  - Betrayal increases nail damage dealt. Warriors deals damage to the nearest enemy after taking damage.
 
 ## Glyph of the King
@@ -150,9 +150,34 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Light
  - Epic
  - Unlocked by defeating the Radiance
- - Dream Nail deals damage in exchange for Essence
+ - Nail attacks will destroy most of the Radiance's attacks upon contact
 
 ## Glyph of Spores
  - Common
  - Unlocked by completing Mister Mushroom's journey
  - Increases damage dealt by Spore Shroom
+
+## Glyph of Bravery
+ - Rare
+ - Unlocked by defeating White Defender five times
+ - Increases size of clouds created by Defender's Crest and their damage rate
+
+ ## Glyph of Loneliness
+ - Epic
+ - Unlocked by defeating Grey Prince Zote four times
+ - Increases damage dealt by Dive spells
+
+ ## Glyph of Nightmares / Glyph of Friendship
+ - Epic
+ - Unlocked by defeating Nightmare King Grimm. Destroying the ritual with Brumm instead unlocks Glyph of Friendship.
+ - Increases damage dealt by Grimmchild. Friendship adds an additional chance for Carefree Melody to trigger and block damage.
+
+ ## Glyph of Binding
+ - Legendary
+ - Unlocked by completing the Path of Pain
+ - Increases damage dealt by Thorns of Agony
+
+ ## Glyph of Honey
+ - Rare
+ - Unlocked by defeating Hive Knight
+ - Adds a chance to heal for additional health when Hiveblood is equipped

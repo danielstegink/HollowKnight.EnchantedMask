@@ -35,7 +35,6 @@ namespace EnchantedMask.Helpers.UI
         public static void Run()
         {
             On.HeroController.Update += CheckIcon;
-            ModHooks.SavegameLoadHook += ResetGlyphs;
         }
 
         /// <summary>
@@ -144,8 +143,7 @@ namespace EnchantedMask.Helpers.UI
         /// <summary>
         /// When a new save is loaded, we need to reset the glyphs to use the new save data
         /// </summary>
-        /// <param name="obj"></param>
-        private static void ResetGlyphs(int obj)
+        public static void ResetGlyphs()
         {
             // Store the currently equipped glyph so the reset doesn't wipe it out
             equippedGlyph = SharedData.saveSettings.EquippedGlyph;
@@ -154,6 +152,8 @@ namespace EnchantedMask.Helpers.UI
             {
                 glyph.Unequip();
             }
+
+            SharedData.saveSettings.EquippedGlyph = equippedGlyph;
         }
     }
 }

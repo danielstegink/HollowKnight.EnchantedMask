@@ -56,7 +56,10 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// As a Common glyph, Gold is worth 1 notch.
-        /// Golden Touch is 2 notches, but without fragility its more like a 4-notch.
+        /// Golden Touch is 2 notches, but its initial fragility adjusts its value.
+        /// I have not found a good way to quantify this fragility, so I will
+        ///     assume it gives a 2-notch discount, meaning Unbreakable Greed
+        ///     should cost 4 notches.
         /// If 4 notches is worth a 20% boost, then 1 notch would be a 5% boost.
         /// </summary>
         /// <returns></returns>

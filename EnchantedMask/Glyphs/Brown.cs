@@ -1,5 +1,4 @@
-﻿using Modding;
-using UnityEngine;
+﻿using EnchantedMask.Helpers.GlyphHelpers;
 
 namespace EnchantedMask.Glyphs
 {
@@ -30,63 +29,38 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            ModHooks.ObjectPoolSpawnHook += BuffDungCloud;
+            dungTrailHelper = new DungTrailHelper(ID, GetModifier());
+            dungTrailHelper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            dungDamage = -1f;
-            ModHooks.ObjectPoolSpawnHook -= BuffDungCloud;
-        }
-
-        /// <summary>
-        /// Stores the original damage rate of the dung cloud
-        /// </summary>
-        private float dungDamage = -1f;
-
-        /// <summary>
-        /// The Brown glyph increases the damage rate of Defender's Crest.
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
-        private GameObject BuffDungCloud(GameObject gameObject)
-        {
-            if (gameObject.name.Equals("Knight Dung Trail(Clone)") &&
-                PlayerData.instance.equippedCharm_10)
+            if (dungTrailHelper != null)
             {
-                StoreOriginalDamage(gameObject);
-
-                gameObject.GetComponent<DamageEffectTicker>().damageInterval = dungDamage * GetModifier();
-                //SharedData.Log($"{ID} - Damage interval set to {gameObject.GetComponent<DamageEffectTicker>().damageInterval}");
-            }
-
-            return gameObject;
-        }
-
-        /// <summary>
-        /// Stores the original damage rate for the dung cloud so that 
-        /// we can safely upgrade it only once
-        /// </summary>
-        /// <param name="gameObject"></param>
-        private void StoreOriginalDamage(GameObject gameObject)
-        {
-            if (dungDamage < 0)
-            {
-                dungDamage = gameObject.GetComponent<DamageEffectTicker>().damageInterval;
+                dungTrailHelper.Stop();
             }
         }
+
+        /// <summary>
+        /// Used for handling size of Defender's Crest clouds
+        /// </summary>
+        private DungTrailHelper dungTrailHelper;
 
         /// <summary>
         /// As an Uncommon glyph, Brown is worth 2 notches.
-        /// Defender's Crest is only worth 1 notch normally, so we
-        ///     can increase its damage rate by 200%.
-        /// Except Defender's Crest uses DOT, so it stacks easily.
+        /// So Defender's Crest would be worth 3 notches, equivalent to tripling its damage rate.
+        /// Tripling the damage rate could mean increasing the damage speed, but it can also mean
+        ///     increasing the range to hit triple the enemies.
+        /// The size of the cloud, which only slightly extends past the player, can typically
+        ///     accomodate only 1 enemy.
+        /// For the cloud to accomodate 3x the enemies, assuming the enemies surround the player,
+        ///     doubling the size of the cloud seems appropriate.
         /// </summary>
         internal override float GetModifier()
         {
-            return 0.3f;
+            return 2f;
         }
     }
 }

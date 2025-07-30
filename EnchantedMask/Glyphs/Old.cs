@@ -67,13 +67,13 @@
 
         /// <summary>
         /// Old is an Uncommon glyph, so its worth 2 notches.
-        /// However, it is kind of hard to balance something like this, so I will use 
-        ///     Fyrenest's SlowTime charm as a reference, then go off my gut.
+        /// There is no in-game precedent for slowing time to give players more response time.
+        /// I'm going to trust in Fyrenest, which has a 2-notch charm that slows time to 60%.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.8f;
+            return 0.6f;
         }
     }
 }

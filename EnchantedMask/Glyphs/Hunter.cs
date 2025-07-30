@@ -60,15 +60,15 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// As a Rare glyph, Hunter is worth 3 notches.
-        /// That would be worth a 30% boost in nail strength or a 
-        ///     45% boost in spell damage, but for all damage, the 
-        ///     value should be much smaller.
+        /// Shaman Stone increases all spell damage by an average of 45% for 3 notches.
+        ///     A 45% increase in nail damage would be worth 4.5 notches, so a 45% increase
+        ///     in both would be worth 6 notches.
+        /// As a Rare glyph, Hunter is worth 3 notches. So it's worth a 22.5% increase.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.2f;
+            return 0.225f;
         }
     }
 }

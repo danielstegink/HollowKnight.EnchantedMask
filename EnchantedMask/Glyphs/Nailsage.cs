@@ -64,14 +64,14 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// As an Uncommon glyph, Nailsage is worth 2 notches.
-        /// Normally this would be a 20% nail damage increase. 
-        /// However, Nail Arts are hard to pull off, so they are worth more.
+        /// For 1 notch, NMG reduces Nail Art charge time by 44%. If you include the 0.4 second animation time,
+        ///     that means it increased the DPS of Nail Arts by 52%.
+        /// As an Uncommon glyph, Nailsage is worth 2 notches, so its worth a 104% increase.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.35f;
+            return 1.04f;
         }
     }
 }

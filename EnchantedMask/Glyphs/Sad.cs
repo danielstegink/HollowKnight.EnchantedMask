@@ -60,16 +60,13 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// As a Rare glyph, Sad is worth 3 notches.
-        /// That would be worth a 30% boost in nail strength,
-        ///     but for all damage, the value should be much smaller.
-        /// On the other hand, this glyph only takes effect if the 
-        ///     player is at full health, so that inflates the value
-        ///     somewhat.
+        /// Per Hunter, 3 notches is a 22.5% damage boost.
+        /// However, per Grub, requiring full health makes a bonus 4 times as valuable.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.3f;
+            return 0.9f;
         }
     }
 }

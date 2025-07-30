@@ -59,10 +59,8 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Shaman Stone, a 3-notch charm, boosts spell damage by an average of 
-        ///     44% across the various spells.
-        /// As an Uncommon glyph, Soul is worth a 2-notch charm, and
-        ///     thus boosts spell damage by 30%.
+        /// Shaman Stone, a 3-notch charm, boosts spell damage by an average of 44% across the various spells.
+        /// As an Uncommon glyph, Soul is worth a 2-notch charm, and thus boosts spell damage by 30%.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()

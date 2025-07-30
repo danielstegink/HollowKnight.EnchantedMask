@@ -85,11 +85,9 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// Green is a Common glyph, so its worth 1 notch.
-        /// SOU gives the speed boost it does for 2 notches,
-        ///     so a 50% increase makes sense.
-        /// SOU also has visual synergies with Baldur Shell
-        ///     and Spore Shroom, but no actual synergies,
-        ///     so Green will include them in its calculations.
+        /// SOU gives the speed boost it does for 2 notches, so a 50% increase makes sense.
+        /// SOU also has visual synergies with Baldur Shell and Spore Shroom, but no actual 
+        ///     synergies, so Green will include them in its calculations.
         /// </summary>
         internal override float GetModifier()
         {

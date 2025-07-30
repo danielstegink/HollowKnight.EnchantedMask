@@ -1,13 +1,11 @@
 ﻿using GlobalEnums;
 using UnityEngine;
 
-namespace EnchantedMask.Helpers
+namespace EnchantedMask.Helpers.GlyphHelpers.Components
 {
     /// <summary>
     /// Lumafly Damage is the damage component for the lumafly swarm from the
     ///     Teacher glyph.
-    /// The Teacher is an Uncommon glyph, making it worth 2 notches. So it should
-    ///     do twice as much damage per second as Defender's Crest.
     /// </summary>
     public class LumaflyDamage : MonoBehaviour
     {
@@ -20,12 +18,12 @@ namespace EnchantedMask.Helpers
                 return;
             }
 
-            // By default, we want to deal only a little damage
-            // The lumaflies are a hazard (1), so the damage should be Generic
+            // Teacher is an Uncommon glyph worth 2 notches.
+            // Grimmchild also costs 2 notches and deals 11 damage to the nearest enemy every 2 seconds
             HitInstance hit = new HitInstance
             {
-                DamageDealt = 15,
-                AttackType = AttackTypes.Generic,
+                DamageDealt = 11,
+                AttackType = AttackTypes.Generic, // The lumaflies are a hazard, so the damage should be Generic
                 IgnoreInvulnerable = true,
                 Source = gameObject,
                 Multiplier = 1f

@@ -53,8 +53,7 @@
         /// <param name="hitInstance"></param>
         private void SSDamage(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
         {
-            if (hitInstance.Source.name.Equals("Sharp Shadow") &&
-                PlayerData.instance.gotCharm_16)
+            if (hitInstance.Source.name.Equals("Sharp Shadow"))
             {
                 int baseDamage = hitInstance.DamageDealt;
                 int bonusDamage = GetBonus(baseDamage);
@@ -67,8 +66,7 @@
 
         /// <summary>
         /// Sibling is a Common glyph, so its worth 1 notch.
-        /// Sharp Shadow costs 2 notches, so increasing the damage by 50% for 
-        ///     1 notch is balanced.
+        /// Sharp Shadow costs 2 notches, so we'll increase its damage by 50%.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()

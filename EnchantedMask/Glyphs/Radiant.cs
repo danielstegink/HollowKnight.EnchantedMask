@@ -1,5 +1,9 @@
 ﻿using EnchantedMask.Settings;
-using System;
+using Satchel;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace EnchantedMask.Glyphs
 {
@@ -9,7 +13,7 @@ namespace EnchantedMask.Glyphs
         public override string Name => "Glyph of Light";
         public override Tiers Tier => Tiers.Epic;
         public override string Description => "The symbol of the source of the Infection.\n\n" +
-                                                "Allows the bearer to spend Essence to damage enemies with the Dream Nail.";
+                                                "Imbues the bearer's nail with the power to cut through the Light.";
 
         public override bool Unlocked()
         {
@@ -44,139 +48,221 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            On.EnemyDreamnailReaction.RecieveDreamImpact += DreamAttack;
+            GetPrefabs();
+            GameManager.instance.StartCoroutine(LightNail());
         }
 
         public override void Unequip()
         {
             base.Unequip();
+        }
 
-            On.EnemyDreamnailReaction.RecieveDreamImpact -= DreamAttack;
+        #region Get Prefabs
+        /// <summary>
+        /// Stores dream particles for VFX purposes
+        /// </summary>
+        private GameObject prefab;
+
+        /// <summary>
+        /// Stores the Dream Nail sound effect
+        /// </summary>
+        private AudioClip soundFx;
+
+        /// <summary>
+        /// Gets the VFX and audio prefabs
+        /// </summary>
+        private void GetPrefabs()
+        {
+            // Get Dream particles VFX from preloaded Revek
+            GameObject revek = SharedData.preloads["RestingGrounds_08"]["Ghost revek"];
+            PlayMakerFSM fsm = revek.LocateMyFSM("Appear");
+            prefab = fsm.FsmVariables.FindFsmGameObject("Idle Pt").Value;
+
+            // Get the Dream Nail sound from the Dream Nail FSM
+            GameObject knight = HeroController.instance.gameObject;
+            fsm = knight.LocateMyFSM("Dream Nail");
+            HutongGames.PlayMaker.FsmState state = fsm.GetValidState("Slash");
+            HutongGames.PlayMaker.Actions.AudioPlayerOneShotSingle audioStep = state.GetAction<HutongGames.PlayMaker.Actions.AudioPlayerOneShotSingle>(6);
+            soundFx = (AudioClip)audioStep.audioClip.Value;
+        }
+        #endregion
+
+        /// <summary>
+        /// The Radiant glyph gives regular nail attacks the ability to destroy attacks from the Radiance
+        /// </summary>
+        private IEnumerator LightNail()
+        {
+            while (IsEquipped())
+            {
+                // Get a list of all active colliders
+                Collider2D[] colliders = UnityEngine.Component.FindObjectsOfType<Collider2D>()
+                                                                .Where(x => x.enabled)
+                                                                .ToArray();
+                GameObject[] colliderObjects = colliders.Select(x => x.gameObject).ToArray();
+
+                // Get a list of all nail attacks
+                GameObject[] nailAttacks = colliderObjects.Where(x => SharedData.nailAttackNames.Contains(x.name))
+                                                            .ToArray();
+                //SharedData.Log($"{ID} - {nailAttacks.Length} active nail attacks found");
+
+                // Get a list of all Radiant attacks
+                GameObject[] radiantAttacks = colliderObjects.Where(x => IsRadiantAttack(x))
+                                                                .ToArray();
+                //SharedData.Log($"{ID} - {radiantAttacks.Length} active Radiance attacks found");
+
+                // Go through each Radiant attack
+                foreach (GameObject attack in radiantAttacks)
+                {
+                    Collider2D collider = attack.GetComponent<Collider2D>();
+
+                    // Go through each nail attack
+                    foreach (GameObject nailAttack in nailAttacks)
+                    {
+                        Collider2D other = nailAttack.GetComponent<Collider2D>();
+                        //SharedData.Log($"{ID} - Comparing {attack.name} ({collider.bounds}) to {nailAttack.name} ({other.bounds})");
+
+                        // If the 2 overlap, destroy the attack
+                        if (Overlap(collider.bounds, other.bounds))
+                        {
+                            // Radiant Spikes have to be briefly disabled instead of destroyed
+                            if (attack.name.StartsWith("Radiant Spike"))
+                            {
+                                //SharedData.Log($"{ID} - Disabling {attack.name}");
+                                GameManager.instance.StartCoroutine(Destroy(attack, true));
+                            }
+                            else
+                            {
+                                //SharedData.Log($"{ID} - Destroying {attack.name}");
+                                GameManager.instance.StartCoroutine(Destroy(attack));
+                            }
+                        }
+                    }
+                }
+
+                yield return new WaitForSeconds(Time.deltaTime);
+            }
+
+            yield return new WaitForSeconds(0f);
         }
 
         /// <summary>
-        /// The Radiant glyph spends Essence to deal extra damage to enemies
+        /// Checks if a game object is a Radiance attack
         /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        private void DreamAttack(On.EnemyDreamnailReaction.orig_RecieveDreamImpact orig, EnemyDreamnailReaction self)
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        private bool IsRadiantAttack(GameObject gameObject)
         {
-            // Run the dream nail first 
-            orig(self);
-
-            // Confirm the enemy has a HealthManager for us to damage
-            HealthManager enemy = self.gameObject.GetComponent<HealthManager>();
-            if (enemy != default)
+            // Due to the complexity, I've decided that Radiant Beams won't be affected
+            if (gameObject.name.StartsWith("Radiant Nail") ||
+                gameObject.name.StartsWith("Radiant Spike") ||
+                gameObject.name.StartsWith("Radiant Orb"))
             {
-                // Calculate the amount of damage to deal and how much Essence to use
-                int essenceSpent = GetEssence();
-                if (essenceSpent > 0)
-                {
-                    // Calculate the damage
-                    float damagePerSoul = GetDamagePerSoul();
-                    float soulPerEssence = GetSoulPerEssence();
-                    float damage = damagePerSoul * soulPerEssence * (float)essenceSpent;
-                    int damageInt = (int)Math.Round(damage);
-
-                    // Set up a spell attack
-                    HitInstance dreamHit = new HitInstance
-                    {
-                        DamageDealt = damageInt,
-                        AttackType = AttackTypes.Spell,
-                        IgnoreInvulnerable = true,
-                        Source = HeroController.instance.gameObject,
-                        Multiplier = 1f
-                    };
-
-                    // Deal the damage
-                    enemy.Hit(dreamHit);
-                    //SharedData.Log($"{ID} - {damageInt} damage dealt for {essenceSpent} Essence");
-
-                    // Remove the essence from our inventory and add them as 
-                    // essence spent so the game knows to increase the chance of 
-                    // us getting more
-                    PlayerData.instance.dreamOrbs -= essenceSpent;
-                    PlayerData.instance.dreamOrbsSpent += essenceSpent;
-                }
+                return true;
+            }
+            else
+            {
+                //SharedData.Log($"{ID} - Attack {gameObject.name} not recognized.");
+                return false;
             }
         }
 
         /// <summary>
-        /// Radiant effectively adds a spell cast to the Dream Nail,
-        ///     so we need to pick a spell and calculate damage based
-        ///     on it.
+        /// Check if the bounds of two colliders overlap
         /// </summary>
+        /// <param name="b1"></param>
+        /// <param name="b2"></param>
         /// <returns></returns>
-        internal float GetDamagePerSoul()
+        private bool Overlap(Bounds b1, Bounds b2)
         {
-            // DN has short range and a long cast time. So of all 
-            //      the spells, it is most similar to Abyss Shriek.
-            // Abyss Shriek creates 4 bursts, so we can Radiant
-            //      as a single burst at 1/4 the regular SOUL cost.
-            float baseDamage = 20f;
-            float soulCost = 33f / 4f;
+            // Determine which one is "left" of the other
+            Bounds left = b1.min.x <= b2.min.x ? b1 : b2;
+            Bounds right = b1.min.x <= b2.min.x ? b2 : b1;
 
-            return baseDamage / soulCost;
+            // Confirm the left overlaps with the right on the horizontal scale
+            if (left.max.x < right.min.x)
+            {
+                return false;
+            }
+
+            // Determine which one is "above" the other
+            Bounds top = b1.min.y >= b2.min.y ? b1 : b2;
+            Bounds bottom = b1.min.y >= b2.min.y ? b2 : b1;
+
+            // Confirm the top overlaps with the bottom on the vertical scale
+            if (bottom.max.y < top.min.y)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
-        /// Determines how much SOUL 1 Essence is worth
+        /// Destroys the given object
         /// </summary>
+        /// <param name="gameObject"></param>
+        /// <param name="disable">Flag to only briefly disable the object</param>
         /// <returns></returns>
-        private float GetSoulPerEssence()
+        private IEnumerator Destroy(GameObject gameObject, bool disable = false)
         {
-            // Normally the user gets 11 SOUL per nail attack. Assuming the enemy can survive
-            //      3 nail attacks (about 60 HP w/ Pure Nail), thats 33 SOUL per enemy.
-            // In comparison, Essence has a drop rate of 1 per 300 enemes. Now, this glyph
-            //      will result in us spending a lot of Essence, so the ratio will increase to
-            //      1 per 60 enemies.
-            // On paper, this makes it very valuable. However, we use SOUL constantly and 
-            //      use Essence practically never, so it makes sense to seriously adjust
-            //      the value.
-            // I'm thinking Essence should be only 1% as valuable, since we only ever use it for
-            //      Dream Gates.
-            // 33 * 60 / 100 = 19.8
-            return 19.8f;
+            GameManager.instance.StartCoroutine(DisplayVFX(gameObject));
+            gameObject.SetActive(false);
+
+            // If we're only disabling the attack, re-enable it after 1 second
+            if (disable)
+            {
+                yield return new WaitForSeconds(1f);
+                gameObject.SetActive(true);
+            }
         }
 
         /// <summary>
-        /// Determines how much Essence to spend on extra damage
+        /// Performs special effects to give the destruction of the Radiance's attacks more flair
         /// </summary>
         /// <returns></returns>
-        private int GetEssence()
+        private IEnumerator DisplayVFX(GameObject gameObject)
         {
-            // Radiant uses Essence to deal extra damage when it 
-            //      normally wouldn't deal any.
-            // So, how much SOUL would we spend for 1 notch?
-            // DN is like a Nail Art, so we're adding a Spell to a
-            //      Nail Art, doubling our DPS.
-            // A 3-notch charm like Shaman Stone or Quick Slash increases
-            //      DPS by 40%, and casting an extra spell would be like
-            //      adding 100%, which would be worth 7.5 notches.
-            // However, Dream Nail and Nail Arts are difficult to pull off.
-            //      Spells and regular Nail attacks take about 0.41 seconds
-            //      to trigger, while Dream Nail takes 1.75 seconds, 426.82%
-            //      as long.
-            // So, if we factor in that the spell is spread out over a much
-            //      longer period of time, it actually becomes worth about
-            //      1.75 notches
-            // Radiant is an Epic glyph, making it worth 4 notches. So
-            //      Radiant should cast 227% of a spell
-            float spellsPerDreamNail = 1.75f / 0.41f;
-            float notchesPerSpell = 7.5f / spellsPerDreamNail;
-            float baseSoul = 33f;
-            float totalSoul = baseSoul * 4f / notchesPerSpell;
-            //SharedData.Log($"{ID} - Total SOUL spent: {totalSoul}");
+            // Create a copy of the dream particles prefab
+            // Prefab is actually pretty small, so we'll make multiple
+            List<GameObject> vfxList = new List<GameObject>();
+            Vector3[] offsets = new Vector3[]
+            {
+                new Vector3(0.25f, 0.25f),
+                new Vector3(0.25f, -0.25f),
+                new Vector3(-0.25f, -0.25f),
+                new Vector3(-0.25f, 0.25f),
 
-            // Finally, calculate the total essence based on the total SOUL
-            float soulPerEssence = GetSoulPerEssence();
-            float maxEssence = totalSoul / soulPerEssence;
-            //SharedData.Log($"{ID} - Max essence: {maxEssence}");
+                new Vector3(-0.5f, -0.5f),
+                new Vector3(0f, -0.5f),
+                new Vector3(0.5f, -0.5f),
+                new Vector3(-0.5f, 0f),
+                new Vector3(0f, 0f),
+                new Vector3(0.5f, 0f),
+                new Vector3(-0.5f, 0.5f),
+                new Vector3(0f, 0.5f),
+                new Vector3(0.5f, 0.5f),
+            };
+            foreach (Vector3 offset in offsets)
+            {
+                Vector3 position = gameObject.transform.position + new Vector3(0f, -1f) + offset;
+                GameObject vfx = UnityEngine.GameObject.Instantiate(prefab, position, Quaternion.identity);
 
-            // Remember to check how much Essence we actually have to spend
-            int maxEssenceInt = (int)Math.Round(maxEssence);
-            return Math.Min(maxEssenceInt, PlayerData.instance.dreamOrbs);
+#pragma warning disable CS0618 // Per Lost Artifacts, we have to use the obsolete option below
+                vfx.GetComponent<ParticleSystem>().enableEmission = true;
+#pragma warning restore CS0618
+
+                vfxList.Add(vfx);
+            }
+
+            // Play the Dream Nail sound effect
+            HeroController.instance.GetComponent<AudioSource>().PlayOneShot(soundFx, 1f);
+
+            // Wait before destroying the VFX
+            yield return new WaitForSeconds(1.5f);
+            foreach( GameObject vfx in vfxList)
+            {
+                UnityEngine.GameObject.Destroy(vfx);
+            }
         }
     }
 }

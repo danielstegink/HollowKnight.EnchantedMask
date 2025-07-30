@@ -1,10 +1,4 @@
-﻿using EnchantedMask.Settings;
-using GlobalEnums;
-using Modding;
-using System;
-using System.Collections;
-using System.Diagnostics;
-using UnityEngine;
+﻿using EnchantedMask.Helpers.BlockHelpers;
 
 namespace EnchantedMask.Glyphs
 {
@@ -45,73 +39,20 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            On.HeroController.TakeDamage += SelfStab;
+            selfStab.ApplyHook();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            On.HeroController.TakeDamage -= SelfStab;
+            selfStab.RemoveHook();
         }
 
         /// <summary>
-        /// Stores if the player is currently immune to damage
+        /// Handles damage negation for the Hollow glyph inspired by 
+        ///     the Hollow Knight's Self Stab ability.
         /// </summary>
-        private bool isImmune = false;
-
-        /// <summary>
-        /// The Hollow glyph negates all damage for a short time after taking damage
-        /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <param name="go"></param>
-        /// <param name="damageSide"></param>
-        /// <param name="damageAmount"></param>
-        /// <param name="hazardType"></param>
-        private void SelfStab(On.HeroController.orig_TakeDamage orig, HeroController self, GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
-        {
-            if (CanTakeDamage(hazardType) && 
-                damageAmount > 0)
-            {
-                if (isImmune)
-                {
-                    damageAmount = 0;
-                }
-                else
-                {
-                    GameManager.instance.StartCoroutine(StartDamageShield());
-                }
-            }
-
-            orig(self, go, damageSide, damageAmount, hazardType);
-        }
-
-        /// <summary>
-        /// As an Epic glyph, Hollow is worth 4 notches. 
-        /// There honestly isn't a good way to calculate what's balanced, so I'm going to 
-        ///     just play it by ear.
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerator StartDamageShield()
-        {
-            SharedData.Log($"{ID} - Immunity started");
-            Stopwatch timer = Stopwatch.StartNew();
-
-            isImmune = true;
-            SpriteFlash flash = SharedData.GetField<HeroController, SpriteFlash>(HeroController.instance, "spriteFlash");
-
-            for (int i = 0; i < 8; i++)
-            {
-                flash.flashInfected();
-                yield return new WaitForSeconds(0.5f);
-
-                flash.flashInfected();
-                yield return new WaitForSeconds(0.5f);
-            }
-
-            isImmune = false;
-            SharedData.Log($"{ID} - Immunity ended. Total time: {timer.ElapsedMilliseconds}ms");
-        }
+        private SelfStab selfStab = new SelfStab();
     }
 }

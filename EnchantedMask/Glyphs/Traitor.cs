@@ -1,9 +1,8 @@
-﻿using EnchantedMask.Helpers.UI;
+﻿using EnchantedMask.Helpers.GlyphHelpers;
+using EnchantedMask.Helpers.UI;
 using EnchantedMask.Settings;
 using GlobalEnums;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace EnchantedMask.Glyphs
@@ -70,8 +69,8 @@ namespace EnchantedMask.Glyphs
         {
             base.Unequip();
 
-            On.HealthManager.TakeDamage -= BuffNail;
             On.HeroController.TakeDamage -= RevengeStrike;
+            On.HealthManager.TakeDamage -= BuffNail;
         }
 
         /// <summary>
@@ -119,27 +118,25 @@ namespace EnchantedMask.Glyphs
             //      such as if they still have I-Frames.
             if (hazardType == 1 && canTakeDamage)
             {
-                int nailDamage = PlayerData.instance.nailDamage;
-                int revengeDamage = GetBonus(nailDamage);
-                HitInstance hit = new HitInstance
-                {
-                    DamageDealt = revengeDamage,
-                    AttackType = AttackTypes.Generic,
-                    IgnoreInvulnerable = true,
-                    Source = self.gameObject,
-                    Multiplier = 1f
-                };
-
                 // Most enemies aren't directly linked to their attacks, so instead we 
                 //      need to compromise by targetting the closest enemy
-                HealthManager[] enemies = UnityEngine.Component.FindObjectsOfType<HealthManager>();
-                List<HealthManager> enemiesByDistance = enemies.OrderBy(x => GetDistance(x.transform, self.gameObject.transform))
-                                                            .ToList();
-                if (enemiesByDistance.Count > 0)
+                GameObject closestEnemy = GetEnemyHelper.GetNearestEnemy();
+                if (closestEnemy != null)
                 {
-                    HealthManager closestEnemy = enemiesByDistance[0];
-                    closestEnemy.Hit(hit);
-                    //SharedData.Log($"{ID} - Enemy {closestEnemy.gameObject.name} hit for {revengeDamage} damage.");
+                    int nailDamage = PlayerData.instance.nailDamage;
+                    int revengeDamage = GetBonus(nailDamage);
+                    HitInstance attack = new HitInstance
+                    {
+                        DamageDealt = revengeDamage,
+                        AttackType = AttackTypes.Generic,
+                        IgnoreInvulnerable = true,
+                        Source = self.gameObject,
+                        Multiplier = 1f
+                    };
+
+                    HealthManager enemyHealth = closestEnemy.GetComponent<HealthManager>();
+                    enemyHealth.Hit(attack);
+                    //SharedData.Log($"{ID} - Enemy {closestEnemy.name} hit for {revengeDamage} damage.");
                 }
             }
         }
@@ -150,7 +147,8 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         internal override float GetModifier()
         {
-            // Warrior is a Rare glyph, so its worth 3 notches.
+            // Warrior/Traitor are a Rare glyph, so they're worth 3 notches.
+
             // Thorns of Agony is a 1-notch charm and deals 1x nail damage,
             //      so Warrior should deal triple that.
             if (PlayerData.instance.clothKilled)
@@ -159,23 +157,11 @@ namespace EnchantedMask.Glyphs
             }
             else
             {
-                // Traitor is Rare, so its worth 3 notches
-                // Nail damage is worth a 10% boost per notch.
+                // Unbreakable Strength increase nail damage by 50% for 3 notches.
+                // Per Greed, I've decided that Unbreakable is worth 2 extra notches.
+                // So nail damage is worth about a 10% boost per notch.
                 return 0.3f;
             }
-        }
-
-        /// <summary>
-        /// Uses Pythagorean to get distance between 2 objects
-        /// </summary>
-        /// <param name="enemy"></param>
-        /// <param name="player"></param>
-        /// <returns></returns>
-        internal float GetDistance(Transform enemy, Transform player)
-        {
-            float xDiff = Math.Abs(enemy.GetPositionX() - player.GetPositionX());
-            float yDiff = Math.Abs(enemy.GetPositionY() - player.GetPositionY());
-            return (float)Math.Sqrt(xDiff * xDiff + yDiff * yDiff);
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using HutongGames.PlayMaker.Actions;
 
 namespace EnchantedMask.Helpers.UI.InventoryPage
 {
@@ -80,6 +81,16 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
         /// Current column selected on the slot grid
         /// </summary>
         private int selectedColumn = -1;
+
+        /// <summary>
+        /// Sound bite played when a glyph is equipped
+        /// </summary>
+        private AudioClip equipSound;
+
+        /// <summary>
+        /// Sound bite played when a glyph is removed
+        /// </summary>
+        private AudioClip unequipSound;
         #endregion
 
         /// <summary>
@@ -94,6 +105,8 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
                 selectedRow = -1;
                 selectedColumn = -1;
                 hiddenSprite = SpriteHelper.GetSprite("Hidden");
+                equipSound = SoundsHelper.GetEquipSound();
+                unequipSound = SoundsHelper.GetUnequipSound();
 
                 // The icon, name, tier and description should all populate the right 1/3 of the screen
                 // In order: Name, Tier, Description
@@ -567,6 +580,7 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
                     if (SharedData.saveSettings.EquippedGlyph.Equals(glyph.ID))
                     {
                         glyph.Unequip();
+                        HeroController.instance.GetComponent<AudioSource>().PlayOneShot(unequipSound, 1f);
                     }
                     else
                     {
@@ -579,6 +593,7 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
                         }
 
                         glyph.Equip();
+                        HeroController.instance.GetComponent<AudioSource>().PlayOneShot(equipSound, 1f);
                     }
 
                     //SharedData.Log("Updating page");

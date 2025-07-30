@@ -1,5 +1,4 @@
 ﻿using EnchantedMask.Glyphs;
-using Modding;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -27,7 +26,6 @@ namespace EnchantedMask.Settings
             new Mantis(),
             new Soul(),
             new Brown(),
-            new Fluke(),
             new Crystal(),
             new Dream(),
             new Gold(),
@@ -35,6 +33,7 @@ namespace EnchantedMask.Settings
             new Nailsage(),
             new Hornet(),
             new Blue(),
+            new Fluke(),
             new Watcher(),
             new Teacher(),
             new Beast(),
@@ -48,6 +47,13 @@ namespace EnchantedMask.Settings
             new Sibling(),
             new Radiant(),
             new Shroom(),
+            new White(),
+            new Grey(),
+            new Nightmare(),
+            new Bound(),
+            new Hive(),
+            //new Void(),
+            //new God(),
         };
 
         /// <summary>

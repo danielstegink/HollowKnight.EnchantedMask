@@ -47,13 +47,18 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Tracks if the 3rd jump is available
+        /// Broken is an Uncommon glyph worth 2 notches.
+        /// Jumping is kind of like dashing upwards. Dashmaster allows dashing downards, but it is generally 
+        ///     accepted as kind of a goof ability and not worth any notches.
+        /// An extra jump means the player can "dash" twice per stretch, which is equivalent to a 50% reduction.
+        /// However, it only applies to upward "dashes", reducing it by about 1/3 its value to the notch value 
+        ///     of a 16.67% reduction.
+        /// Per Dashmaster, such a reduction is worth 1 notch. So we should give 2 jumps for 2 notches.
         /// </summary>
-        private bool canExtraJump = true;
+        private int extraJumps = 2;
 
         /// <summary>
-        /// The Broken glyph makes it so the bearer can jump 
-        /// thrice with Monarch Wings instead of twice
+        /// The Broken glyph makes it so the bearer can jump extra times with Monarch Wings.
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
@@ -82,39 +87,38 @@ namespace EnchantedMask.Glyphs
                     !self.controlReqlinquished &&
                     !landedStates.Contains(self.hero_state) &&
                     inAir &&
-                    canExtraJump;
+                    extraJumps > 0;
         }
 
         /// <summary>
-        /// We need to add a special case to the double jump so it supports 
-        /// the triple jump
+        /// We need to add a special case to the double jump so it supports extra jumps
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
         public void DoExtraJump(On.HeroController.orig_DoDoubleJump orig, HeroController self)
         {
             // If we are not double-jumping, we need to reset the wings for graphics purposes
-            // and note that we've used our extra jump
+            //      and note that we've used an extra jump
             bool isDoubleJumping = !SharedData.GetField<HeroController, bool>(self, "doubleJumped");
             if (!isDoubleJumping)
             {
                 self.dJumpWingsPrefab.SetActive(false);
                 self.dJumpFlashPrefab.SetActive(false);
-                canExtraJump = false;
+                extraJumps--;
             }
 
             orig(self);
         }
 
         /// <summary>
-        /// Once we've landed on the ground, triple-jump resets
+        /// Once we've landed on the ground, reset the jump counter
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
         /// <exception cref="NotImplementedException"></exception>
         private void ResetJump(On.HeroController.orig_BackOnGround orig, HeroController self)
         {
-            canExtraJump = true;
+            extraJumps = 2;
             orig(self);
         }
     }

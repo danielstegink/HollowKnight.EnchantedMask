@@ -18,7 +18,39 @@ You can find a detailed list of each glyph, its abilities, and how to get it in 
 
 Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs from one's inventory.
 
+## Thanks
+Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
+
 ## Patch Notes
+1.1.0.0
+- Added new glyphs for the expansions (Godhome is still a work in progress)
+- Glyphs page now plays sound effects when glyphs are equipped/unequipped
+- Glyphs properly reset between saves
+- Balance patches and documentation changes for various glyphs
+	- Exploration requirements now require getting a map of every region
+	- Childhood deals more damage with Elegy beams and doesn't require that Grubberfly's Elegy be equipped
+	- Hunter deals more damage
+	- Love has been upgraded from Common to Uncommon, giving 2 notches instead of 1
+	- Honour doesn't make dung clouds as big, but it should now be compatible with Pale Court
+	- Crystal increases CDash damage by half of the player's nail damage instead of by 50%
+	- Dream's effect has been replaced with Light's old effect of making Dream Nail do damage using Essence.
+	- Broken gives 2 extra jumps instead of 1
+	- Nail deals more damage
+	- Hornet uses new logic to mimic base-game I-Frames
+	- Life has a reduced chance of giving Lifeblood masks
+	- Fluke deals more damage
+	- Watcher deals more damage
+	- Teacher spawns lumaflies on the nearest enemy instead of the player
+	- Beast doesn't require that Weaversong be equipped
+	- Sacrifice gives immunity for less time and uses new I-Frame logic
+	- Warrior uses simpler logic for finding nearest enemy
+	- King uses new I-Frame logic
+	- Wisdom slows time more
+	- Mourning deals more damage
+	- Darkness doesn't require that Sharp Shadow be equipped
+	- Light has a new effect: basic nail attacks destroy most of the Radiance's attacks upon contact
+	- Spores doesn't require that Spore Shroom be equipped
+
 1.0.1.0
 - Rebalanced Beast to double Weaverlings instead of tripling them
 - Fixed Dream to stop giving Essence when unequipped
@@ -27,4 +59,4 @@ Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs 
 - Rebalanced Radiant to deal more damage
 - Modified Royal to perform the same "Can Take Damage" check as Hornet
 - Modified Snail and Teacher to check if the glyph is equipped, rather than track active status via variable
--	Modified clues to be more descriptive while keeping some mystery
+- Modified clues to be more descriptive while keeping some mystery

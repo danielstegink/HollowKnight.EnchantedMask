@@ -43,8 +43,9 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// False reduces the number of hits required to stagger a boss
-        /// by 1
+        /// False reduces the number of hits required to stagger a boss.
+        /// For 2 notches, Heavy Blow reduces stagger by 1 and increases knockback.
+        /// So we can reduce stagger by 1 for 1 notch.
         /// </summary>
         /// <param name="enemy"></param>
         /// <param name="isAlreadyDead"></param>

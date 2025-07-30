@@ -10,7 +10,7 @@
 
         public override bool Unlocked()
         {
-            return PlayerData.instance.mapAllRooms;
+            return MappedAllRooms();
         }
 
         public override string GetClue()
@@ -19,12 +19,33 @@
             {
                 return "A mapmaker continues his journey across the kingdom.";
             }
-            else if (!PlayerData.instance.mapAllRooms)
+            else if (!MappedAllRooms())
             {
                 return "Your map of the kingdom is incomplete.";
             }
 
             return base.GetClue();
+        }
+
+        /// <summary>
+        /// Determines if the player has acquired a map of every region
+        /// </summary>
+        /// <returns></returns>
+        private bool MappedAllRooms()
+        {
+            return PlayerData.instance.mapCrossroads &&
+                    PlayerData.instance.mapGreenpath &&
+                    PlayerData.instance.mapFogCanyon &&
+                    PlayerData.instance.mapRoyalGardens &&
+                    PlayerData.instance.mapFungalWastes &&
+                    PlayerData.instance.mapCity &&
+                    PlayerData.instance.mapWaterways &&
+                    PlayerData.instance.mapMines &&
+                    PlayerData.instance.mapDeepnest &&
+                    PlayerData.instance.mapCliffs &&
+                    PlayerData.instance.mapOutskirts &&
+                    PlayerData.instance.mapRestingGrounds &&
+                    PlayerData.instance.mapAbyss;
         }
 
         public override void Equip()

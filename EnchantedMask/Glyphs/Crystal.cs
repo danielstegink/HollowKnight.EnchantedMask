@@ -64,13 +64,15 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// As a Common glyph, Crystal should be equivalent to a 1-notch charm.
-        /// This would be worth a 10% increase in nail damage. However, CDash is a 
-        ///     very niche attack, so I'm comfortable going much higher.
+        /// CDash is a niche dash, much like DDash.
+        /// Sharp Shadow uses 2 notches to give DDash damage equal to our nail.
+        /// So for 1 notch, Crystal can increase CDash damage by an amount
+        ///     equal to half our current nail damage.
         /// </summary>
         /// <returns></returns>
-        internal override float GetModifier()
+        internal override int GetBonus(int baseValue)
         {
-            return 0.5f;
+            return PlayerData.instance.nailDamage / 2;
         }
     }
 }

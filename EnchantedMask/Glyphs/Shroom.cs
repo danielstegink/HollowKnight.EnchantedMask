@@ -58,8 +58,7 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         private GameObject BuffShroom(GameObject gameObject)
         {
-            if (gameObject.name.Equals("Knight Spore Cloud(Clone)") &&
-                PlayerData.instance.equippedCharm_17)
+            if (gameObject.name.Equals("Knight Spore Cloud(Clone)"))
             {
                 StoreOriginalDamage(gameObject);
 
@@ -85,8 +84,7 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// As a Common glyph, Shroom is worth 1 notch.
-        /// Spore Shroom is only worth 1 notch normally, so we
-        ///     can increase its damage rate by 100%.
+        /// Spore Shroom is only worth 1 notch normally, so we can increase its damage rate by 100%.
         /// </summary>
         internal override float GetModifier()
         {

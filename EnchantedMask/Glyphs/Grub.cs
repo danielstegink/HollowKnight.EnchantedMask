@@ -79,7 +79,7 @@ namespace EnchantedMask.Glyphs
         /// As a Rare glyph, Grub is worth 3 notches. However, it affects 2 charms. As such, 
         ///     each charm will receive 75% of the bonus it usually would.
         /// Grubsong grants 15 SOUL when damaged for 1 notch, so Grub will grant 
-        ///     15 * 3 * 0.75 = 33.75 SOUL, rounded down to 33
+        ///     15 * 3 * 0.75 = 33.75 SOUL, rounded down to 33.
         /// </summary>
         /// <returns></returns>
         internal float GetGrubsongModifier()
@@ -95,8 +95,7 @@ namespace EnchantedMask.Glyphs
         /// <param name="hitInstance"></param>
         private void Elegy(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
         {
-            if (hitInstance.Source.name.Contains("Grubberfly") &&
-                PlayerData.instance.equippedCharm_35)
+            if (hitInstance.Source.name.Contains("Grubberfly"))
             {
                 int bonusDamage = GetBonus(hitInstance.DamageDealt);
                 hitInstance.DamageDealt += bonusDamage;
@@ -107,16 +106,24 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Grubberfly's Elegy deals nail damage, which is normally 10% per notch.
-        /// Elegy beams are more niche, but they also have tradeoff advantages,
-        ///     so they still only get a 10% bonus per notch.
-        /// So final tally of 3 * 0.75 notches times 10% per notch comes out to a 
-        ///     22.5% boost in nail damage
+        /// For 3 notches, Grubberfly's Elegy adds an extra attack with 50% damage
+        ///     and roughly 300% range while at full health.
+        /// If 1 notch is worth a 10% increase in nail damage, the damage boost is worth 5 notches.
+        /// Additionally, MOP increases range by 25% for 3 notches, so a 200% increase in range
+        ///     is worth about 24 notches. However, this only applies to the Elegy beam which
+        ///     only deals 1/3 of the total damage, so that drops the bonus down to 8 notches.
+        ///     Let's say 7 since the travel time means the beam can miss.
+        /// So the extra damage (and the extra range on that damage) is worth about 12 notches.
+        ///     But requiring us to be at fully health reduces the value to 3 notches.
+        /// So, the 2.25 notch boost should be multiplied by 4 to 9 notches, which is worth
+        ///     a roughly 90% increase in nail damage on top of the original 50% for a total of
+        ///     140%.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.225f;
+            // 0.5 * x = 1.4, X = 2.8
+            return 2.8f;
         }
     }
 }

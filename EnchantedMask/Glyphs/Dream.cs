@@ -1,4 +1,5 @@
 ﻿using EnchantedMask.Settings;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -10,7 +11,7 @@ namespace EnchantedMask.Glyphs
         public override string Name => "Glyph of Dreams";
         public override Tiers Tier => Tiers.Uncommon;
         public override string Description => "The symbol of a forgotten master of dreams.\n\n" +
-                                                "Increases the bearer's affinity with dreams, making it easier to gather Essence.";
+                                                "Allows the bearer to spend Essence to damage enemies with the Dream Nail.";
 
         public override bool Unlocked()
         {
@@ -35,93 +36,118 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            On.EnemyDeathEffects.RecieveDeathEvent += GetEssence;
+            On.EnemyDreamnailReaction.RecieveDreamImpact += DreamAttack;
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            On.EnemyDeathEffects.RecieveDeathEvent -= GetEssence;
+            On.EnemyDreamnailReaction.RecieveDreamImpact -= DreamAttack;
         }
 
+
         /// <summary>
-        /// Dream increases the chance of getting Essence when an enemy dies
+        /// The Dream glyph spends Essence to deal damage to enemies upon Dream Nail hit
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
-        /// <param name="attackDirection"></param>
-        /// <param name="resetDeathEvent"></param>
-        /// <param name="spellBurn"></param>
-        /// <param name="isWatery"></param>
-        private void GetEssence(On.EnemyDeathEffects.orig_RecieveDeathEvent orig, EnemyDeathEffects self, float? attackDirection, bool resetDeathEvent, 
-                                bool spellBurn, bool isWatery)
+        /// <exception cref="NotImplementedException"></exception>
+        private void DreamAttack(On.EnemyDreamnailReaction.orig_RecieveDreamImpact orig, EnemyDreamnailReaction self)
         {
-            orig(self, attackDirection, resetDeathEvent, spellBurn, isWatery);
+            // Run the dream nail first 
+            orig(self);
 
-            EnemyDeathTypes deathType = SharedData.GetField<EnemyDeathEffects, EnemyDeathTypes>(self, "enemyDeathType");
-            EnemyDeathTypes[] validTypes = new EnemyDeathTypes[] 
-            { 
-                EnemyDeathTypes.Infected,
-                EnemyDeathTypes.LargeInfected,
-                EnemyDeathTypes.SmallInfected,
-                EnemyDeathTypes.Uninfected
-            };
-
-            // We only get Essence from enemies with certain conditions
-            if (validTypes.Contains(deathType) && 
-                !BossSceneController.IsBossScene)
+            // Confirm the enemy has a HealthManager for us to damage
+            HealthManager enemy = self.gameObject.GetComponent<HealthManager>();
+            if (enemy != default)
             {
-                int random = UnityEngine.Random.Range(1, 101);
-                int essenceChance = EssenceChance();
-                //SharedData.Log($"{ID} - Checking Essence: {random} vs {essenceChance}");
-                if (random <= essenceChance)
+                // Calculate the amount of damage to deal and how much Essence to use
+                int essenceSpent = GetEssence();
+                if (essenceSpent > 0)
                 {
-                    GameObject dreamPrefab = SharedData.GetField<EnemyDeathEffects, GameObject>(self, "dreamEssenceCorpseGetPrefab");
-                    dreamPrefab.Spawn(self.transform.position + self.effectOrigin);
+                    // Calculate the damage
+                    float damagePerSoul = GetDamagePerSoul();
+                    float soulPerEssence = GetSoulPerEssence();
+                    float damage = damagePerSoul * soulPerEssence * essenceSpent;
+                    int damageInt = (int)Math.Round(damage);
 
-                    PlayerData.instance.dreamOrbs++;
-                    PlayerData.instance.dreamOrbsSpent--;
-                    EventRegister.SendEvent("DREAM ORB COLLECT");
+                    // Set up a spell attack
+                    HitInstance dreamHit = new HitInstance
+                    {
+                        DamageDealt = damageInt,
+                        AttackType = AttackTypes.Spell,
+                        IgnoreInvulnerable = true,
+                        Source = HeroController.instance.gameObject,
+                        Multiplier = 1f
+                    };
+
+                    // Deal the damage
+                    enemy.Hit(dreamHit);
+                    //SharedData.Log($"{ID} - {damageInt} damage dealt for {essenceSpent} Essence");
+
+                    // Remove the essence from our inventory and add them as 
+                    // essence spent so the game knows to increase the chance of 
+                    // us getting more
+                    PlayerData.instance.dreamOrbs -= essenceSpent;
+                    PlayerData.instance.dreamOrbsSpent += essenceSpent;
                 }
             }
         }
 
         /// <summary>
-        /// Dream is an Uncommon glyph, so it's worth 2 notches.
+        /// Dream effectively adds a spell cast to the Dream Nail,
+        ///     so we need to pick a spell and calculate damage based
+        ///     on it.
         /// </summary>
         /// <returns></returns>
-        private int EssenceChance()
+        internal float GetDamagePerSoul()
         {
-            // Dream Wielder increases the chance by 50% for 1 notch, though this just 1 of its many effects.
-            // It also significantly reduces Dream Nail charge time, which I would say is 50% of its value,
-            //      and increases the SOUL gained, which I would classify as 1/3 of its value.
-            // So, that leaves 1/6 of its value being extra Essence. Multiplying from 1/6 of a notch to 
-            //      2 full ones, we want to increase the chance of gaining Essence by 1200%
+            // Dream uses Essence to deal extra damage when it normally wouldn't deal any.
+            // For 2 notches, Glowing Womb uses 8 SOUL to deal 9 extra damage every 4 seconds.
+            //      That's 1.125 damage per SOUL per second per notch.
+            // Dream is an Uncommon glyph worth 2 notches. Additionally, this damage
+            //      only applies when using a Dream Nail, which takes 1.75 seconds to charge.
+            // That means we should deal 3.9375 damage per SOUL.
+            return 3.938f;
+        }
 
-            // There are 2 cases: for default we have a 1 in 300 chance of getting Essence, if we've spent
-            //      a lot of Essence we have a 1 in 60 chance.
-            // So, Dream Wielder gives a 50% boost, specifically converting the cases above to 1 in 200 and
-            //      1 in 40.
-            // So, 1/300 * 1.5 = 1/200 and 1/60 * 1.5 = 1/40
-            // In our case, we need to approximate 1/300 * 13 and 1/60 * 13, or 1/23.08 and 1/4.62
+        /// <summary>
+        /// Determines how much SOUL 1 Essence is worth
+        /// </summary>
+        /// <returns></returns>
+        private float GetSoulPerEssence()
+        {
+            // Normally the user gets 11 SOUL per nail attack. Assuming the enemy can survive
+            //      3 nail attacks (about 60 HP w/ Pure Nail), thats 33 SOUL per enemy.
+            // In comparison, Essence has a drop rate of 1 per 300 enemes. Now, this glyph
+            //      will result in us spending a lot of Essence, so the ratio will increase to
+            //      1 per 60 enemies.
+            // On paper, this makes it very valuable. However, we use SOUL constantly and 
+            //      use Essence practically never, so it makes sense to seriously adjust
+            //      the value.
+            // I'm thinking Essence should be only 1% as valuable, since we only ever use it for
+            //      Dream Gates.
+            // 33 * 60 / 100 = 19.8
+            return 19.8f;
+        }
 
-            // So, our new equations are 1/300 + X = 7/300 and 1/60 + X = 7/60
-            // There isn't a mathematical approximation of this, but we know how to determine which case
-            //      to look for, so instead we solve for 1/300 + X = 13/300 and 1/60 + Y = 13/60
-            // X = 1/25, Y = 1/5
-
-            // So if PlayerData.instance.dreamOrbsSpent > 0, we want a 20% chance of getting Essence.
-            // Otherwise, we want a 4% chance.
-
-            if (PlayerData.instance.dreamOrbsSpent > 0)
-            {
-                return 20;
-            }
-            else
-            {
-                return 4;
-            }
+        /// <summary>
+        /// Determines how much Essence to spend on extra damage
+        /// </summary>
+        /// <returns></returns>
+        private int GetEssence()
+        {
+            // Dream uses Essence to deal extra damage when it normally wouldn't deal any.
+            // So, how much SOUL would we spend for 1 notch?
+            // DN is like a Nail Art, so we're adding a Spell to a Nail Art.
+            // For 2 notches, Glowing Womb uses 8 SOUL to deal 9 extra damage every 4 seconds.
+            //      That's 1 SOUL per second per notch.
+            // Dream Nail takes 1.75 seconds to attack, and Dream is worth 2 notches, so
+            //      we would spend 3.5 SOUL.
+            // But we need to spend at least 1 Essence, so we'll spend 1 Essence for 19.8 SOUL.
+            // DN is hard to pull off anyway, so this is probably fine.
+            return Math.Min(1, PlayerData.instance.dreamOrbs);
         }
     }
 }

@@ -4,7 +4,7 @@
     {
         public override string ID => "Blessed";
         public override string Name => "Glyph of Love";
-        public override Tiers Tier => Tiers.Common;
+        public override Tiers Tier => Tiers.Uncommon;
         public override string Description => "The symbol of one who is overflowing with love.\n\n" +
                                                 "Allows the bearer to use more charms.";
 
@@ -33,7 +33,7 @@
 
             if (!applied)
             {
-                PlayerData.instance.charmSlots++;
+                PlayerData.instance.charmSlots += 2;
                 applied = true;
                 //SharedData.Log($"{ID} - Charm slots increased");
             }
@@ -46,7 +46,7 @@
 
             if (applied)
             {
-                PlayerData.instance.charmSlots--;
+                PlayerData.instance.charmSlots -= 2;
                 applied = false;
                 //SharedData.Log($"{ID} - Charm slots reduced");
             }
@@ -55,10 +55,8 @@
 
         /// <summary>
         /// The Blessed glyph adds charm notches.
-        /// Blessed is a Common glyph worth 1 notch, so 
-        ///     it gives 1 notch.
-        /// When unequipping the glyph, we need a way
-        ///     to confirm that we've added a notch.
+        /// Blessed is an Uncommon glyph worth 2 notches, so that's what it gives.
+        /// When unequipping the glyph, we need a way to confirm that we've added a notch.
         /// </summary>
         private bool applied = false;
     }

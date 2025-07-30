@@ -44,16 +44,13 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
         /// <exception cref="ArgumentException"></exception>
         public Spacing(int masksPerRow)
         {
-            MasksPerRow = masksPerRow;
-            SharedData.Log($"Masks per row: {MasksPerRow}");
-
             x = -10.98f;
             y = 4;
 
-            ColumnSpace = 15f / MasksPerRow;
-            RowSpace = 15f / MasksPerRow;
-
-            scale = 10f / MasksPerRow;
+            MasksPerRow = masksPerRow;
+            ColumnSpace = 14f / MasksPerRow;
+            RowSpace = 14f / MasksPerRow;
+            scale = 8f / MasksPerRow;
         }
 
         /// <summary>

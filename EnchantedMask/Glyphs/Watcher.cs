@@ -41,9 +41,10 @@ namespace EnchantedMask.Glyphs
             On.HealthManager.Hit += BuffHatchlings;
             On.HutongGames.PlayMaker.Actions.IntOperator.OnEnter += BuffWeaverlings;
             ModHooks.ObjectPoolSpawnHook += BuffFlukes;
-            dungFlukeHelper = new DungFlukeHelper(1 - GetModifier());
-            dungFlukeHelper.Start();
 
+            // See Fluke for this logic
+            dungFlukeHelper = new DungFlukeHelper(1 / (1 + GetModifier()), Name);
+            dungFlukeHelper.Start();
         }
 
         public override void Unequip()
@@ -54,6 +55,7 @@ namespace EnchantedMask.Glyphs
             On.HealthManager.Hit -= BuffHatchlings;
             On.HutongGames.PlayMaker.Actions.IntOperator.OnEnter -= BuffWeaverlings;
             ModHooks.ObjectPoolSpawnHook -= BuffFlukes;
+
             if (dungFlukeHelper != null)
             {
                 dungFlukeHelper.Stop();
@@ -173,14 +175,14 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Watcher glyph is Uncommon, so its worth 2 notches. 
-        /// Normally this would be worth 20% nail damage, but pet damage is
-        ///     niche and requires multiple charms, so this can be increased.
+        /// This charm is meant to augment Grimmchild, Weaversong, Glowing Womb and Flukenest, a total of 9 notches.
+        /// Let's assume 1 of them isn't equipped to encourage build diversity, bringing the total to about 6 notches.
+        /// Watcher glyph is an Uncommon glyph worth 2 notches, so it should boost overall damage by 33%.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.3f;
+            return 1f / 3f;
         }
     }
 }

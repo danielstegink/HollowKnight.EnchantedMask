@@ -57,7 +57,7 @@
         /// <summary>
         /// As an Epic glyph, Fool is worth 4 notches.
         /// Quick Focus is worth 3 notches and speeds healing up by 33%,
-        ///     so Fool will increase healing speed by 44%
+        ///     so Fool will increase healing speed by 44%.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()

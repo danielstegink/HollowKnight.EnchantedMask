@@ -1,4 +1,5 @@
-﻿using EnchantedMask.Helpers;
+﻿using EnchantedMask.Helpers.GlyphHelpers;
+using EnchantedMask.Helpers.GlyphHelpers.Components;
 using EnchantedMask.Settings;
 using GlobalEnums;
 using HutongGames.PlayMaker.Actions;
@@ -14,7 +15,7 @@ namespace EnchantedMask.Glyphs
         public override string Name => "Glyph of the Teacher";
         public override Tiers Tier => Tiers.Uncommon;
         public override string Description => "The symbol of the kingdom's greatest scholar.\n\n" +
-                                                "Attracts a swarm of lumaflies that damage nearby enemies.";
+                                                "Attracts a swarm of lumaflies that damage the nearest enemy.";
 
         public override bool Unlocked()
         {
@@ -74,17 +75,30 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Teacher glyph spawns a lumafly swarm roughly every 2 seconds
+        /// Teacher glyph spawns a lumafly swarm on the nearest enemy every 2 seconds
         /// </summary>
         /// <returns></returns>
         private IEnumerator SpawnLumaflies()
         {
             while (IsEquipped())
             {
-                GameObject swarm = UnityEngine.GameObject.Instantiate(prefab, HeroController.instance.transform.position, Quaternion.identity);
-                swarm.SetActive(true);
+                // Get the closest enemy
+                GameObject closestEnemy = GetEnemyHelper.GetNearestEnemy();
+                if (closestEnemy != null)
+                {
+                    Vector3 target = closestEnemy.gameObject.transform.position;
 
-                yield return new WaitForSeconds(1.5f);
+                    // Create a swarm
+                    Vector3 source = HeroController.instance.transform.position;
+                    GameObject swarm = UnityEngine.GameObject.Instantiate(prefab, target, Quaternion.identity);
+                    swarm.SetActive(true);
+
+                    // Only wait after we've summoned a swarm
+                    // If it takes more than 2 seconds to find one, we should fire automatically
+                    yield return new WaitForSeconds(2f);
+                }
+
+                yield return new WaitForSeconds(0f);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using EnchantedMask.Settings;
+﻿using EnchantedMask.Helpers.GlyphHelpers.Components;
+using EnchantedMask.Settings;
 using Modding.Utils;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,15 +17,18 @@ namespace EnchantedMask.Helpers
     /// </summary>
     public class DungFlukeHelper
     {
-        public bool isActive { get; set; } = true;
+        public bool isActive { get; set; } = false;
 
         public float modifier { get; set; } = 1f;
 
+        public string featureName { get; set; } = "";
+
         public bool performLogging { get; set; } = false;
 
-        public DungFlukeHelper(float modifier, bool log = false)
+        public DungFlukeHelper(float modifier, string featureName, bool log = false)
         {
             this.modifier = modifier;
+            this.featureName = featureName;
             performLogging = log;
         }
 
@@ -33,6 +37,7 @@ namespace EnchantedMask.Helpers
         /// </summary>
         public void Start()
         {
+            isActive = true;
             GameManager.instance.StartCoroutine(DungFlukeCheck());
         }
 
@@ -42,6 +47,7 @@ namespace EnchantedMask.Helpers
         public void Stop()
         {
             isActive = false;
+            ResetDamage();
         }
 
         /// <summary>
@@ -54,76 +60,119 @@ namespace EnchantedMask.Helpers
             {
                 // Get a list of all the active dung clouds
                 List<GameObject> dungClouds = UnityEngine.GameObject.FindObjectsOfType<GameObject>()
-                                                                    .Where(x => x.name.Equals("Knight Dung Cloud"))
+                                                                    .Where(x => x.name.StartsWith("Knight Dung Cloud"))
                                                                     .ToList();
                 foreach (GameObject cloud in dungClouds)
                 {
                     // Get or add a ModsApplied component
-                    ModsApplied modsApplied = cloud.GetOrAddComponent<ModsApplied>();
+                    DungFlukeModded modsApplied = cloud.GetOrAddComponent<DungFlukeModded>();
                     if (performLogging)
                     {
-                        SharedData.Log($"DungFlukeHelper - Mods applied: {string.Join("|", modsApplied.ModList)}, " +
-                                                            $"Base damage interval: {modsApplied.baseValue}, " +
-                                                            $"Modded damage interval: {modsApplied.moddedValue}");
+                        SharedData.Log($"DungFlukeHelper - Mods applied: {string.Join("|", modsApplied.ModList.Keys)}, " +
+                                        $"Base damage interval: {modsApplied.BaseValue}");
                     }
 
-                    // Get the Damage ticker and its interval
+                    // Get the current value
                     DamageEffectTicker damageEffectTicker = cloud.GetComponent<DamageEffectTicker>();
-                    float interval = damageEffectTicker.damageInterval;
+                    float currentValue = damageEffectTicker.damageInterval;
 
-                    // If we are modding for the first time, the base value will be -1, 
+                    // If we are modding for the first time, the base value will be default, 
                     // so we need to store the base value for future reference
-                    if (modsApplied.baseValue < 0)
+                    if (modsApplied.BaseValue == default)
                     {
-                        modsApplied.baseValue = interval;
+                        modsApplied.BaseValue = currentValue;
                     }
 
-                    // If the modded interval is less than 0, it hasn't been set yet
-                    if (modsApplied.moddedValue < 0)
+                    // If current value doesn't match the modded value, it most likely has reset
+                    // In that scenario, we have nothing to worry about
+                    float moddedValue = modsApplied.BaseValue * modsApplied.GetModifier();
+                    if (moddedValue != currentValue)
                     {
-                        modsApplied.moddedValue = interval;
-                    }
-
-                    // If the current interval doesnt match the modded interval, then the Dung Cloud has
-                    // been reset and we need to reapply the modded interval
-                    if (modsApplied.moddedValue != interval)
-                    {
-                        // It is possible that the expected modifier has changed: Dung clouds have different
-                        // intervals based on if the player has Shaman Stone equipped. When this happens, 
-                        // all changes should be cleared out
-
-                        // However, Dung Cloud has different bases depending on if the player has 
-                        // Shaman Stone equipped, so the old base and stored base may be different. In this
-                        // case, we want to reset and redo the buffs
-                        if (interval != modsApplied.baseValue)
+                        // However, if the base value has changed, we need to do a full reset of the component
+                        if (currentValue != modsApplied.BaseValue)
                         {
-                            modsApplied.moddedValue = interval;
-                            modsApplied.ModList = new List<string>();
-                        }
-                        else
-                        {
-                            interval = modsApplied.moddedValue;
+                            modsApplied.BaseValue = currentValue;
+                            modsApplied.ModList = new Dictionary<string, (string, float)>();
                         }
                     }
 
-                    // Now, with the base interval established and updated, 
-                    // we can check if this mod has been applied
-                    if (!modsApplied.ModList.Contains(SharedData.modName))
+                    // Now, with the base value established, we can check if this mod has been applied
+                    // First check if a different feature from the same mod was used. If so, reset its bonus
+                    if (modsApplied.ModList.ContainsKey(SharedData.modName))
                     {
-                        interval *= modifier;
-                        modsApplied.ModList.Add(SharedData.modName);
-                        //
+                        (string, float) value = modsApplied.ModList[SharedData.modName];
+                        if (!value.Item1.Equals(featureName))
+                        {
+                            modsApplied.ModList.Remove(SharedData.modName);
+                            if (performLogging)
+                            {
+                                SharedData.Log($"DungFlukeHelper - Damage interval reduced by {value.Item2} to remove {value.Item1}");
+                            }
+                        }
+                    }
+
+                    // Then apply our feature if it isn't there already
+                    if (!modsApplied.ModList.ContainsKey(SharedData.modName))
+                    {
+                        modsApplied.ModList.Add(SharedData.modName, (featureName, modifier));
                         if (performLogging)
                         {
-                            SharedData.Log($"DungFlukeHelper - Damage interval changed to {interval}");
+                            SharedData.Log($"DungFlukeHelper - Damage interval increased by {modifier} for {featureName}");
                         }
                     }
 
-                    damageEffectTicker.SetDamageInterval(interval);
-                    modsApplied.moddedValue = interval;
+                    damageEffectTicker.SetDamageInterval(modsApplied.BaseValue * modsApplied.GetModifier());
                 }
 
                 yield return new WaitForSeconds(Time.deltaTime);
+            }
+        }
+
+        /// <summary>
+        /// When a glyph is deactivated, we should remove its buff as well in case its ongoing
+        /// </summary>
+        private void ResetDamage()
+        {
+            // Get a list of all the active dung clouds
+            List<GameObject> dungClouds = UnityEngine.GameObject.FindObjectsOfType<GameObject>()
+                                                                .Where(x => x.name.StartsWith("Knight Dung Trail(Clone)"))
+                                                                .ToList();
+            foreach (GameObject cloud in dungClouds)
+            {
+                // Get or add a ModsApplied component
+                DungDamageModded modsApplied = cloud.GetOrAddComponent<DungDamageModded>();
+
+                // Get the current damage rate
+                DamageEffectTicker damageEffectTicker = cloud.GetComponent<DamageEffectTicker>();
+                float interval = damageEffectTicker.damageInterval;
+
+                // If we are modding for the first time, the base value will be default, 
+                // so we need to store the base value for future reference
+                if (modsApplied.BaseValue == default)
+                {
+                    modsApplied.BaseValue = interval;
+                }
+
+                // If current value doesn't match the modded value, it most likely has reset
+                // In that scenario, we have nothing to worry about
+                float moddedValue = modsApplied.BaseValue * modsApplied.GetModifier();
+                if (moddedValue != interval)
+                {
+                    // However, if the base value has changed, we need to do a full reset of the component
+                    if (interval != modsApplied.BaseValue)
+                    {
+                        modsApplied.BaseValue = interval;
+                        modsApplied.ModList = new Dictionary<string, (string, float)>();
+                    }
+                }
+
+                // Now, with the base value established, we can check if this mod has been applied
+                if (modsApplied.ModList.ContainsKey(SharedData.modName))
+                {
+                    modsApplied.ModList.Remove(SharedData.modName);
+                }
+
+                damageEffectTicker.SetDamageInterval(modsApplied.BaseValue * modsApplied.GetModifier());
             }
         }
     }
