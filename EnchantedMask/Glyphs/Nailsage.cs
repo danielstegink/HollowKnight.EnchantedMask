@@ -64,14 +64,21 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// For 1 notch, NMG reduces Nail Art charge time by 44%. If you include the 0.4 second animation time,
-        ///     that means it increased the DPS of Nail Arts by 52%.
-        /// As an Uncommon glyph, Nailsage is worth 2 notches, so its worth a 104% increase.
+        /// As an Uncommon glyph, Nailsage is worth 2 notches.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 1.04f;
+            // For 1 notch, NMG reduces NA charge time by 44%
+            // For 3 notches, Quick Slash reduces nail attack cooldown by 39%
+            // By this logic, any damage bonus should be 2.75 times as valuable as the one for a regular nail attack
+            // For 2 notches, we would normally increase nail damage by 20%.
+            // For NA, this becomes a 55% increase
+            float nmgPerNotch = 0.75f / 1.35f;
+            float quickSlashPerNotch = 0.25f / 0.41f / 3f;
+            float nailArtToNailAttackRatio = nmgPerNotch / quickSlashPerNotch;
+
+            return 0.2f * nailArtToNailAttackRatio; 
         }
     }
 }

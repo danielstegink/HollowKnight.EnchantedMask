@@ -5,6 +5,8 @@ using EnchantedMask.Helpers.UI;
 using EnchantedMask.Settings;
 using Modding;
 using SFCore.Utils;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -14,15 +16,13 @@ namespace EnchantedMask
 {
     public class EnchantedMask : Mod, ILocalSettings<SaveSettings>
     {
-        public override string GetVersion() => "1.1.0.0";
+        public override string GetVersion() => "1.1.1.0";
 
         #region Settings
         public void OnLoadLocal(SaveSettings s)
         {
             SharedData.saveSettings = s;
-
-            // When a new save is loaded, replace all of our glyphs so the effects don't persist
-            IconHelper.ResetGlyphs();
+            //SharedData.Log("Save settings loaded");
         }
 
         public SaveSettings OnSaveLocal()
@@ -64,11 +64,35 @@ namespace EnchantedMask
                 DebugHelper debugHelper = new DebugHelper();
                 debugHelper.AddDebugOptions();
             }
+
+            On.HeroController.Start += OnPlayerDataLoaded;
+            On.GameManager.ReturnToMainMenu += OnQuit;
             
             // Need to modify the Spell Control FSM on creation so Void can work
             //On.HeroController.Start += AddVoidSpell;
 
             SharedData.Log("Initialized");
+        }
+
+        private void OnPlayerDataLoaded(On.HeroController.orig_Start orig, HeroController self)
+        {
+            //SharedData.Log("Hero Controller started");
+            if (!string.IsNullOrWhiteSpace(SharedData.saveSettings.EquippedGlyph))
+            {
+                Glyphs.Glyph glyph = SharedData.glyphs.Where(x => x.ID.Equals(SharedData.saveSettings.EquippedGlyph))
+                                                        .First();
+                glyph.Equip();
+            }
+        }
+
+        private IEnumerator OnQuit(On.GameManager.orig_ReturnToMainMenu orig, GameManager self, GameManager.ReturnToMainMenuSaveModes saveMode, Action<bool> callback)
+        {
+            // Some glyphs, like Blessed, modify player data, so we have to reset them all
+            // when we close a save file
+            IconHelper.ResetGlyphs();
+
+            //SharedData.Log("Closing save");
+            return orig(self, saveMode, callback);
         }
 
         /// <summary>

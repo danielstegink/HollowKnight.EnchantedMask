@@ -87,6 +87,7 @@ namespace EnchantedMask.Glyphs
         /// </summary>
         public virtual void Unequip()
         {
+            //SharedData.Log($"Unequipping the {Name} ({ID})");
             SharedData.saveSettings.EquippedGlyph = "";
 
             // Remove hooks

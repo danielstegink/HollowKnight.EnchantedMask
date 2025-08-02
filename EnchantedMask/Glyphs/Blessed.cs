@@ -1,4 +1,6 @@
-﻿namespace EnchantedMask.Glyphs
+﻿using EnchantedMask.Settings;
+
+namespace EnchantedMask.Glyphs
 {
     public class Blessed : Glyph
     {
@@ -30,12 +32,11 @@
         public override void Equip()
         {
             base.Equip();
-
             if (!applied)
             {
                 PlayerData.instance.charmSlots += 2;
                 applied = true;
-                //SharedData.Log($"{ID} - Charm slots increased");
+                //SharedData.Log($"{ID} - Charm slots increased to {PlayerData.instance.charmSlots}");
             }
             GameManager.instance.RefreshOvercharm();
         }
@@ -48,7 +49,7 @@
             {
                 PlayerData.instance.charmSlots -= 2;
                 applied = false;
-                //SharedData.Log($"{ID} - Charm slots reduced");
+                //SharedData.Log($"{ID} - Charm slots reduced to {PlayerData.instance.charmSlots}");
             }
             GameManager.instance.RefreshOvercharm();
         }

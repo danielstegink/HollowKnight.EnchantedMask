@@ -78,13 +78,13 @@ namespace EnchantedMask.Glyphs
         /// <summary>
         /// As a Rare glyph, Grub is worth 3 notches. However, it affects 2 charms. As such, 
         ///     each charm will receive 75% of the bonus it usually would.
-        /// Grubsong grants 15 SOUL when damaged for 1 notch, so Grub will grant 
+        /// Grubsong grants 15 SOUL when damaged for 1 notch, so Grub will increase this to 
         ///     15 * 3 * 0.75 = 33.75 SOUL, rounded down to 33.
         /// </summary>
         /// <returns></returns>
         internal float GetGrubsongModifier()
         {
-            return 2.25f;
+            return 1.25f;
         }
 
         /// <summary>
@@ -122,8 +122,8 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         internal override float GetModifier()
         {
-            // 0.5 * x = 1.4, X = 2.8
-            return 2.8f;
+            // 0.5 + 0.5x = 1.4, X = 1.8
+            return 1.8f;
         }
     }
 }

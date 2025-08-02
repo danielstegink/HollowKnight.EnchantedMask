@@ -83,16 +83,6 @@ namespace EnchantedMask.Helpers.UI
                 render.SetAlpha(1f);
             }
 
-            // Re-equip the equipped glyph if we reset recently
-            if (!string.IsNullOrEmpty(equippedGlyph))
-            {
-                SharedData.saveSettings.EquippedGlyph = equippedGlyph;
-                Glyph glyph = SharedData.glyphs.Where(x => x.ID.Equals(equippedGlyph)).First();
-                glyph.Equip();
-
-                equippedGlyph = "";
-            }
-
             // Make sure to apply the equipped glyph's icon
             Sprite iconSprite = GetIconSprite(SharedData.saveSettings.EquippedGlyph);
             UnityEngine.UI.Image iconImage = glyphIcon.GetComponent<UnityEngine.UI.Image>();
@@ -145,6 +135,8 @@ namespace EnchantedMask.Helpers.UI
         /// </summary>
         public static void ResetGlyphs()
         {
+            //SharedData.Log("Resetting glyphs");
+
             // Store the currently equipped glyph so the reset doesn't wipe it out
             equippedGlyph = SharedData.saveSettings.EquippedGlyph;
 

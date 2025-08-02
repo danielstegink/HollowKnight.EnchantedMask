@@ -23,6 +23,12 @@ Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs 
 Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
 
 ## Patch Notes
+1.1.1.0
+- Fixed Love's icon to be the correct color
+- Modified save logic so glyph effects don't persist after closing the game
+- Reduced damage from Nail
+- Reduced SOUL and damage gained from Childhood
+
 1.1.0.0
 - Added new glyphs for the expansions (Godhome is still a work in progress)
 - Glyphs page now plays sound effects when glyphs are equipped/unequipped
