@@ -73,7 +73,7 @@ namespace EnchantedMask.Glyphs
             BuffDashCooldown();
             On.HealthManager.TakeDamage += BuffNail;
             On.HealthManager.TakeDamage += BuffSpells;
-            godShield.ApplyHook();
+            godShield.Start();
             GameManager.instance.StartCoroutine(GiveSoul());
         }
 
@@ -85,7 +85,7 @@ namespace EnchantedMask.Glyphs
             On.HeroController.Move -= SpeedBoost;
             On.HealthManager.TakeDamage -= BuffNail;
             On.HealthManager.TakeDamage -= BuffSpells;
-            godShield.RemoveHook();
+            godShield.Stop();
         }
 
         #region Speed

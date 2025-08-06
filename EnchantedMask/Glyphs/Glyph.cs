@@ -150,14 +150,12 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Almost all glyphs use a modifier to set their power level based on their tier.
-        /// And some of them are superior versions of existing glyphs, so being able to 
-        /// just overwrite their lesser versions would be helpful.
+        /// Almost all glyphs use a modifier to set their power level based on their tier
         /// </summary>
         /// <returns></returns>
         internal virtual float GetModifier()
         {
-            return 1.0f;
+            return 1f;
         }
 
         /// <summary>
@@ -167,7 +165,10 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         internal virtual int GetBonus(int baseValue)
         {
-            return (int)Math.Max(1, baseValue * GetModifier());
+            float modifier = GetModifier();
+            int result = (int)Math.Max(1, (float)baseValue * modifier);
+            //SharedData.Log($"Applying {modifier} to {baseValue} gets {result}");
+            return result;
         }
     }
 }

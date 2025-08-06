@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
+using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -52,23 +54,25 @@ namespace EnchantedMask.Glyphs
         /// <exception cref="NotImplementedException"></exception>
         private void BuffDamage(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
         {
-            int bonusDamage = GetBonus(hitInstance.DamageDealt);
+            int baseDamage = hitInstance.DamageDealt;
+            int bonusDamage = GetBonus(baseDamage);
             hitInstance.DamageDealt += bonusDamage;
-            //SharedData.Log($"{ID} - Damage increased by {bonusDamage}");
+            //SharedData.Log($"{ID} - {baseDamage} damage increased by {bonusDamage}");
 
             orig(self, hitInstance);
         }
 
         /// <summary>
-        /// Shaman Stone increases all spell damage by an average of 45% for 3 notches.
-        ///     A 45% increase in nail damage would be worth 4.5 notches, so a 45% increase
-        ///     in both would be worth 6 notches.
-        /// As a Rare glyph, Hunter is worth 3 notches. So it's worth a 22.5% increase.
+        /// Gets the damage modifier
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.225f;
+            // Per my Utils, 1 notch is worth a 6.67% increase in all damage.
+            // As a Rare glyph, Hunter is worth 3 notches. So it's worth a 20% increase.
+            float modifier = 3 * NotchCosts.DamagePerNotch();
+            //SharedData.Log($"{ID} - Damage modifier: {modifier}");
+            return modifier;
         }
     }
 }

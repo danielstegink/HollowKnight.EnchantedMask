@@ -1,5 +1,5 @@
-﻿using Modding;
-using UnityEngine;
+﻿using DanielSteginkUtils.Helpers.Charms.Shroom;
+using EnchantedMask.Settings;
 
 namespace EnchantedMask.Glyphs
 {
@@ -36,59 +36,33 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            ModHooks.ObjectPoolSpawnHook += BuffShroom;
+            helper = new SporeDamageHelper(SharedData.modName, ID, 1 / GetModifier());
+            helper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            ModHooks.ObjectPoolSpawnHook -= BuffShroom;
-        }
-
-        /// <summary>
-        /// Stores the original damage interval of the spore cloud
-        /// </summary>
-        private float sporeDamage = -1f;
-
-        /// <summary>
-        /// The Shroom glyph increases the damage dealt by Spore Shroom
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
-        private GameObject BuffShroom(GameObject gameObject)
-        {
-            if (gameObject.name.Equals("Knight Spore Cloud(Clone)"))
+            if (helper != null)
             {
-                StoreOriginalDamage(gameObject);
-
-                gameObject.GetComponent<DamageEffectTicker>().damageInterval = sporeDamage * GetModifier();
-                //SharedData.Log($"{ID} - Damage interval {gameObject.GetComponent<DamageEffectTicker>().damageInterval}");
-            }
-
-            return gameObject;
-        }
-
-        /// <summary>
-        /// Stores the original damage for the spore cloud so that 
-        /// we can safely upgrade it only once
-        /// </summary>
-        /// <param name="gameObject"></param>
-        private void StoreOriginalDamage(GameObject gameObject)
-        {
-            if (sporeDamage < 0)
-            {
-                sporeDamage = gameObject.GetComponent<DamageEffectTicker>().damageInterval;
+                helper.Stop();
             }
         }
 
         /// <summary>
-        /// As a Common glyph, Shroom is worth 1 notch.
-        /// Spore Shroom is only worth 1 notch normally, so we can increase its damage rate by 100%.
+        /// Utils helper
+        /// </summary>
+        private SporeDamageHelper helper;
+
+        /// <summary>
+        /// The Shroom glyph increases the damage rate of Spore Shroom
         /// </summary>
         internal override float GetModifier()
         {
-            return 0.5f;
+            // As a Common glyph, Shroom is worth 1 notch.
+            // Spore Shroom is only worth 1 notch normally, so we can increase its damage rate by 100%.
+            return 2f;
         }
     }
 }

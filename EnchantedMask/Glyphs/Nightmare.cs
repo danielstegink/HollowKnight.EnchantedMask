@@ -1,4 +1,6 @@
-﻿using EnchantedMask.Helpers.BlockHelpers;
+﻿using DanielSteginkUtils.Helpers.Charms.Pets;
+using DanielSteginkUtils.Helpers.Shields;
+using DanielSteginkUtils.Utilities;
 using EnchantedMask.Helpers.UI;
 using UnityEngine;
 
@@ -57,11 +59,13 @@ namespace EnchantedMask.Glyphs
 
             if (PlayerData.instance.destroyedNightmareLantern)
             {
-                friendshipShield.ApplyHook();
+                carefreeHelper = new CarefreeHelper(GetShieldChance());
+                carefreeHelper.Start();
             }
             else
             {
-                On.HutongGames.PlayMaker.Actions.IntOperator.OnEnter += BuffGrimmchild;
+                grimmchildHelper = new GrimmchildHelper(GetModifier(), 1f, false);
+                grimmchildHelper.Start();
             }
         }
 
@@ -69,46 +73,51 @@ namespace EnchantedMask.Glyphs
         {
             base.Unequip();
 
-            friendshipShield.RemoveHook();
-            On.HutongGames.PlayMaker.Actions.IntOperator.OnEnter -= BuffGrimmchild;
-        }
-
-        #region Nightmare
-        /// <summary>
-        /// Nightmare increases the damage dealt by Grimmchild
-        /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        private void BuffGrimmchild(On.HutongGames.PlayMaker.Actions.IntOperator.orig_OnEnter orig, HutongGames.PlayMaker.Actions.IntOperator self)
-        {
-            if (self.Fsm.Name.Equals("Attack") &&
-                    self.Fsm.GameObject.name.Equals("Enemy Damager") &&
-                    self.Fsm.GameObject.transform.parent.gameObject.name.Contains("Grimmball") &&
-                    self.State.Name.Equals("Hit"))
+            if (carefreeHelper != null)
             {
-                int baseDamage = self.Fsm.GetFsmInt("Damage").Value;
-                self.Fsm.GetFsmInt("Damage").Value += GetBonus(baseDamage);
-                //SharedData.Log($"{ID} - Damage increased from {baseDamage} to {self.Fsm.GetFsmInt("Damage").Value}");
+                carefreeHelper.Stop();
             }
 
-            orig(self);
+            if (grimmchildHelper != null)
+            {
+                grimmchildHelper.Stop();
+            }
         }
 
         /// <summary>
-        /// Nightmare is an Epic glyph worth 4 notches.
-        /// Grimmchild is worth 2 notches, so Nightmare can triple the damage.
+        /// Utils helper
+        /// </summary>
+        private CarefreeHelper carefreeHelper;
+
+        /// <summary>
+        /// Friendship adds a second chance of CM triggering
+        /// </summary>
+        /// <returns></returns>
+        private int GetShieldChance()
+        {
+            // Friendship is an Epic glyph worth 4 notches
+            // Per my Utils, blocking an attack is worth a 7.49% chance per notch, or 29% for 4 notches.
+            float bonus = 4 * NotchCosts.ShieldChancePerNotch();
+
+            // We then feed into Calculations as this is meant to pair with the default CM shield
+            // Per my own math, a 29% boost to CM should result in a second shield with a chance of about 38%
+            return Calculations.GetSecondMelodyShield(bonus);
+        }
+
+        /// <summary>
+        /// Utils helper
+        /// </summary>
+        private GrimmchildHelper grimmchildHelper;
+
+        /// <summary>
+        /// Nightmare increases damage dealt by Grimmchild
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 2f;
+            // Nightmare is an Epic glyph worth 4 notches
+            // Grimmchild is worth 2 notches, so Nightmare can triple the damage
+            return 3f;
         }
-        #endregion
-
-        /// <summary>
-        /// Handles damage negation for the Friendship glyph, inspired by
-        ///     Carefree Melody
-        /// </summary>
-        private FriendshipShield friendshipShield = new FriendshipShield();
     }
 }

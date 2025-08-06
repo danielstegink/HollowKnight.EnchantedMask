@@ -10,13 +10,13 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Childhood
  - Rare
  - Unlocked by rescuing all the grubs and receive Grubfather's final reward
- - Increases SOUL gained from Grubsong by 125%
+ - Increases SOUL gained from Grubsong by 225%
  - Increases damage dealt by Grubberfly's Elegy by 180%
 
 ## Glyph of Deceit
  - Common
  - Unlocked by defeating the False Knight
- - Reduces Stagger requirement of bosses by 1
+ - Reduces Stagger requirement of bosses by 1. Doesn't affect Combo Stagger.
 
 ## Glyph of Shamanism
  - Uncommon
@@ -26,7 +26,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of the Hunter
  - Rare
  - Unlocked by earning the Hunter's Mark
- - Increases all damage dealt by 22.5%
+ - Increases all damage dealt by 20%
 
 ## Glyph of the Past
  - Uncommon
@@ -41,12 +41,12 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Leadership
  - Uncommon
  - Unlocked by defeating the Mantis Lords
- - Increases nail range boost from Mark of Pride to 45%
+ - Increases nail range boost from Mark of Pride to 42%
 
 ## Glyph of Sorcery
  - Uncommon
  - Unlocked by defeating the Soul Master
- - Increases damage dealt by spells by 30%
+ - Increases damage dealt by spells by 50%
 
 ## Glyph of Honour
  - Uncommon
@@ -61,7 +61,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Dreams
  - Uncommon
  - Unlocked by listening to the Seer's last words
- - Dream Nail deals 78 damage in exchange for 1 Essence
+ - Dream Nail deals roughly 75 damage in exchange for 2 Essence
 
 ## Glyph of Greed
  - Common
@@ -86,7 +86,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Life
  - Common
  - Unlocked by earning Lifeblood Core
- - 34% chance of gaining a Lifeblood mask after healing. Equipping Lifeblood charms increases this chance by 2-9%.
+ - 30% chance of gaining a Lifeblood mask after healing. Equipping Lifeblood charms increases this chance by 2-9%.
 
 ## Glyph of Motherhood
  - Uncommon
@@ -111,7 +111,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Sacrifice
  - Epic
  - Unlocked by defeating the Hollow Knight
- - Gives immunity for 3.15 seconds after taking damage
+ - Gives immunity for 3.12 seconds after taking damage
 
 ## Glyph of Unn
  - Common
@@ -126,7 +126,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Betrayal / Glyph of Warriors
  - Rare
  - Unlocked by defeating Traitor Lord. Defeating him with Cloth unlocks Glyph of Warriors.
- - Betrayal increases nail damage dealt by 30%
+ - Betrayal increases nail damage (not including Nail Arts) dealt by 30%
  - Warriors deals triple nail damage to the nearest enemy after taking damage
 
 ## Glyph of the King
@@ -142,7 +142,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Mourning
  - Rare
  - Unlocked by delivering the Delicate Flower to the grave of the Traitor's Child
- - Increases all damage dealt by 90% while at full health
+ - Increases all damage dealt by 80% while at full health
 
 ## Glyph of Darkness
  - Common
@@ -167,7 +167,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
  ## Glyph of Loneliness
  - Epic
  - Unlocked by defeating Grey Prince Zote four times
- - Increases damage dealt by Dive spells by 133%
+ - Increases damage dealt by Dive spells by 200%
 
  ## Glyph of Nightmares / Glyph of Friendship
  - Epic

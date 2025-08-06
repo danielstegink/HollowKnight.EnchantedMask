@@ -1,6 +1,4 @@
 ﻿using EnchantedMask.Helpers.BlockHelpers;
-using System.Collections;
-using UnityEngine;
 
 namespace EnchantedMask.Glyphs
 {
@@ -36,20 +34,23 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            royalShield.ApplyHook();
+            helper = new RoyalShield();
+            helper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            royalShield.RemoveHook();
+            if (helper != null)
+            {
+                helper.Stop();
+            }
         }
 
         /// <summary>
-        /// Handles damage negation for the Royal glyph, 
-        ///     inspired by the White Palace gauntlet.
+        /// Utils helper
         /// </summary>
-        private RoyalShield royalShield = new RoyalShield();
+        private RoyalShield helper;
     }
 }

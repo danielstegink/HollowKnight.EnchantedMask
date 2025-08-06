@@ -1,4 +1,5 @@
-﻿using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
 using Satchel;
 using System.Collections;
 using System.Collections.Generic;
@@ -73,14 +74,16 @@ namespace EnchantedMask.Glyphs
         /// </summary>
         private void GetPrefabs()
         {
-            // Get Dream particles VFX from preloaded Revek
-            GameObject revek = SharedData.preloads["RestingGrounds_08"]["Ghost revek"];
-            PlayMakerFSM fsm = revek.LocateMyFSM("Appear");
-            prefab = fsm.FsmVariables.FindFsmGameObject("Idle Pt").Value;
+            // Get Dream particles VFX from preloaded husk
+            //SharedData.Log($"{ID} - Getting preload");
+            GameObject husk = SharedData.preloads["Crossroads_04"]["_Enemies/Zombie Hornhead"];
+            EnemyDeathEffects component = husk.GetComponent<EnemyDeathEffects>();
+            prefab = ClassIntegrations.GetField<EnemyDeathEffects, GameObject>(component, "dreamEssenceCorpseGetPrefab");
 
             // Get the Dream Nail sound from the Dream Nail FSM
+            //SharedData.Log($"{ID} - Getting sound clip");
             GameObject knight = HeroController.instance.gameObject;
-            fsm = knight.LocateMyFSM("Dream Nail");
+            PlayMakerFSM fsm = knight.LocateMyFSM("Dream Nail");
             HutongGames.PlayMaker.FsmState state = fsm.GetValidState("Slash");
             HutongGames.PlayMaker.Actions.AudioPlayerOneShotSingle audioStep = state.GetAction<HutongGames.PlayMaker.Actions.AudioPlayerOneShotSingle>(6);
             soundFx = (AudioClip)audioStep.audioClip.Value;
@@ -92,6 +95,7 @@ namespace EnchantedMask.Glyphs
         /// </summary>
         private IEnumerator LightNail()
         {
+            //SharedData.Log($"{ID} - Starting coroutine");
             while (IsEquipped())
             {
                 // Get a list of all active colliders
@@ -222,47 +226,15 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         private IEnumerator DisplayVFX(GameObject gameObject)
         {
-            // Create a copy of the dream particles prefab
-            // Prefab is actually pretty small, so we'll make multiple
-            List<GameObject> vfxList = new List<GameObject>();
-            Vector3[] offsets = new Vector3[]
-            {
-                new Vector3(0.25f, 0.25f),
-                new Vector3(0.25f, -0.25f),
-                new Vector3(-0.25f, -0.25f),
-                new Vector3(-0.25f, 0.25f),
-
-                new Vector3(-0.5f, -0.5f),
-                new Vector3(0f, -0.5f),
-                new Vector3(0.5f, -0.5f),
-                new Vector3(-0.5f, 0f),
-                new Vector3(0f, 0f),
-                new Vector3(0.5f, 0f),
-                new Vector3(-0.5f, 0.5f),
-                new Vector3(0f, 0.5f),
-                new Vector3(0.5f, 0.5f),
-            };
-            foreach (Vector3 offset in offsets)
-            {
-                Vector3 position = gameObject.transform.position + new Vector3(0f, -1f) + offset;
-                GameObject vfx = UnityEngine.GameObject.Instantiate(prefab, position, Quaternion.identity);
-
-#pragma warning disable CS0618 // Per Lost Artifacts, we have to use the obsolete option below
-                vfx.GetComponent<ParticleSystem>().enableEmission = true;
-#pragma warning restore CS0618
-
-                vfxList.Add(vfx);
-            }
+            // Spawn the dream particles
+            Vector3 position = gameObject.transform.position;
+            prefab.Spawn(position);
 
             // Play the Dream Nail sound effect
             HeroController.instance.GetComponent<AudioSource>().PlayOneShot(soundFx, 1f);
 
             // Wait before destroying the VFX
             yield return new WaitForSeconds(1.5f);
-            foreach( GameObject vfx in vfxList)
-            {
-                UnityEngine.GameObject.Destroy(vfx);
-            }
         }
     }
 }

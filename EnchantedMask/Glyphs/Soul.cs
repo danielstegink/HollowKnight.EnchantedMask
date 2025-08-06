@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DanielSteginkUtils.Utilities;
+using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -59,13 +60,14 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Shaman Stone, a 3-notch charm, boosts spell damage by an average of 44% across the various spells.
-        /// As an Uncommon glyph, Soul is worth a 2-notch charm, and thus boosts spell damage by 30%.
+        /// Gets the damage modifier
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.3f;
+            // As an Uncommon glyph, Soul is worth 2 notches.
+            // Per my Utils, spell damage should be increased by 16.67% per notch
+            return 2 * NotchCosts.SpellDamagePerNotch();
         }
     }
 }

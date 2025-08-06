@@ -1,4 +1,5 @@
-﻿using EnchantedMask.Helpers.GlyphHelpers;
+﻿using DanielSteginkUtils.Helpers.Attributes;
+using DanielSteginkUtils.Utilities;
 using EnchantedMask.Helpers.UI;
 using EnchantedMask.Settings;
 using GlobalEnums;
@@ -74,7 +75,7 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Traitor increases nail damage. 
+        /// Traitor increases nail damage
         /// </summary>
         /// <param name="orig"></param>
         /// <param name="self"></param>
@@ -82,14 +83,12 @@ namespace EnchantedMask.Glyphs
         /// <exception cref="NotImplementedException"></exception>
         private void BuffNail(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
         {
-            bool isNailAttack = SharedData.nailAttackNames.Contains(hitInstance.Source.name) ||
-                               SharedData.nailArtNames.Contains(hitInstance.Source.name) ||
-                               hitInstance.Source.name.Contains("Grubberfly");
-            if (isNailAttack)
+            if (Logic.IsNailAttack(hitInstance, false))
             {
-                int bonusDamage = GetBonus(hitInstance.DamageDealt);
+                int baseDamage = hitInstance.DamageDealt;
+                int bonusDamage = GetBonus(baseDamage);
                 hitInstance.DamageDealt += bonusDamage;
-                //SharedData.Log($"{ID} - Nail damage increased by {bonusDamage}");
+                //SharedData.Log($"{ID} - {baseDamage} damage increased by {bonusDamage}");
             }
 
             orig(self, hitInstance);
@@ -106,37 +105,26 @@ namespace EnchantedMask.Glyphs
         /// <param name="damageAmount"></param>
         /// <param name="hazardType"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private void RevengeStrike(On.HeroController.orig_TakeDamage orig, HeroController self, GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
+        private void RevengeStrike(On.HeroController.orig_TakeDamage orig, HeroController self, GameObject go, CollisionSide damageSide, 
+                                    int damageAmount, int hazardType)
         {
-            bool canTakeDamage = SharedData.CallFunction<HeroController, bool>(self, "CanTakeDamage", new object[] { });
-
+            // Perform the attack
+            bool canTakeDamage = ClassIntegrations.CallFunction<HeroController, bool>(self, "CanTakeDamage", new object[] { });
             orig(self, go, damageSide, damageAmount, hazardType);
 
-            // If the attacker is an actual enemy and not an acid pool
-            //      or something, hit back.
-            // Also, ignore it if the player can't take damage right now, 
-            //      such as if they still have I-Frames.
-            if (hazardType == 1 && canTakeDamage)
+            // If the attacker is an actual enemy and not an acid pool or something, hit back
+            // Also, ignore it if the player can't take damage right now, such as if they still have I-Frames
+            if (hazardType == 1 && 
+                canTakeDamage)
             {
-                // Most enemies aren't directly linked to their attacks, so instead we 
-                //      need to compromise by targetting the closest enemy
-                GameObject closestEnemy = GetEnemyHelper.GetNearestEnemy();
+                // Most enemies aren't directly linked to their attacks, so instead we need to compromise by targetting the closest enemy
+                GameObject closestEnemy = DanielSteginkUtils.Helpers.GetEnemyHelper.GetNearestEnemy();
                 if (closestEnemy != null)
                 {
                     int nailDamage = PlayerData.instance.nailDamage;
                     int revengeDamage = GetBonus(nailDamage);
-                    HitInstance attack = new HitInstance
-                    {
-                        DamageDealt = revengeDamage,
-                        AttackType = AttackTypes.Generic,
-                        IgnoreInvulnerable = true,
-                        Source = self.gameObject,
-                        Multiplier = 1f
-                    };
-
                     HealthManager enemyHealth = closestEnemy.GetComponent<HealthManager>();
-                    enemyHealth.Hit(attack);
-                    //SharedData.Log($"{ID} - Enemy {closestEnemy.name} hit for {revengeDamage} damage.");
+                    DamageHelper.DealDamage(enemyHealth, revengeDamage, AttackTypes.Generic, self.gameObject);
                 }
             }
         }
@@ -148,19 +136,16 @@ namespace EnchantedMask.Glyphs
         internal override float GetModifier()
         {
             // Warrior/Traitor are a Rare glyph, so they're worth 3 notches.
-
-            // Thorns of Agony is a 1-notch charm and deals 1x nail damage,
-            //      so Warrior should deal triple that.
             if (PlayerData.instance.clothKilled)
             {
+                // Thorns of Agony is a 1-notch charm and deals 1x nail damage,
+                // so Warrior should deal triple that.
                 return 3f;
             }
             else
             {
-                // Unbreakable Strength increase nail damage by 50% for 3 notches.
-                // Per Greed, I've decided that Unbreakable is worth 2 extra notches.
-                // So nail damage is worth about a 10% boost per notch.
-                return 0.3f;
+                // Per my Utils, 3 notches is worth a 30% increase in nail damage
+                return 3 * NotchCosts.NailDamagePerNotch();
             }
         }
     }

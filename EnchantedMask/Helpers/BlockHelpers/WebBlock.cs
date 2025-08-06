@@ -1,4 +1,6 @@
-﻿using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Helpers.Shields;
+using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
 using GlobalEnums;
 using System;
 using System.Collections;
@@ -6,7 +8,7 @@ using UnityEngine;
 
 namespace EnchantedMask.Helpers.BlockHelpers
 {
-    public class WebBlock : BlockHelper
+    public class WebBlock : ShieldHelper
     {
         /// <summary>
         /// Stores custom web shield
@@ -32,22 +34,21 @@ namespace EnchantedMask.Helpers.BlockHelpers
             UnityEngine.GameObject.Destroy(prefab.GetComponent<DamageHero>());
         }
 
-        public override void ApplyHook()
+        public override void Start()
         {
             InitializeWebShield();
 
-            base.ApplyHook();
+            base.Start();
         }
 
         /// <summary>
         /// As a Rare glyph, Hornet is worth 3 notches and has a 22% chance of blocking
         /// </summary>
         /// <returns></returns>
-        public override bool CustomBlockCheck()
+        public override bool CustomShieldCheck()
         {
             int random = UnityEngine.Random.Range(1, 101);
-            //SharedData.Log($"Hornet - Checking {random} against 22");
-            return random <= 22;
+            return random <= 3 * NotchCosts.ShieldChancePerNotch();
         }
 
         /// <summary>

@@ -1,6 +1,4 @@
-﻿using EnchantedMask.Settings;
-
-namespace EnchantedMask.Glyphs
+﻿namespace EnchantedMask.Glyphs
 {
     public class Blessed : Glyph
     {
@@ -12,16 +10,16 @@ namespace EnchantedMask.Glyphs
 
         public override bool Unlocked()
         {
-            return PlayerData.instance.salubraBlessing;
+            return PlayerData.instance.GetBool("salubraBlessing");
         }
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.metCharmSlug)
+            if (!PlayerData.instance.GetBool("metCharmSlug"))
             {
                 return "A lover of antiquity eagerly awaits you in her home.";
             }
-            else if (!PlayerData.instance.salubraBlessing)
+            else if (!PlayerData.instance.GetBool("salubraBlessing"))
             {
                 return "The lover waits for you to claim her blessing.";
             }
@@ -34,6 +32,7 @@ namespace EnchantedMask.Glyphs
             base.Equip();
             if (!applied)
             {
+                // Blessed is an Uncommon glyph worth 2 notches, so that's what it gives
                 PlayerData.instance.charmSlots += 2;
                 applied = true;
                 //SharedData.Log($"{ID} - Charm slots increased to {PlayerData.instance.charmSlots}");
@@ -56,7 +55,6 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// The Blessed glyph adds charm notches.
-        /// Blessed is an Uncommon glyph worth 2 notches, so that's what it gives.
         /// When unequipping the glyph, we need a way to confirm that we've added a notch.
         /// </summary>
         private bool applied = false;

@@ -33,19 +33,18 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            webBlock.ApplyHook();
+            webBlock.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            webBlock.RemoveHook();
+            webBlock.Stop();
         }
 
         /// <summary>
-        /// Handles damage negation for the Hornet glyph inspired by 
-        ///     Hornet's web attack
+        /// Hornet glyph blocks damage inspired by Hornet's web attack
         /// </summary>
         private WebBlock webBlock = new WebBlock();
     }

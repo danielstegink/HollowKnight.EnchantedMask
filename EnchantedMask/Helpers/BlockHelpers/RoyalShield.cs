@@ -1,9 +1,11 @@
-﻿using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Helpers.Shields;
+using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
 using System.Collections;
 
 namespace EnchantedMask.Helpers.BlockHelpers
 {
-    public class RoyalShield : BlockHelper
+    public class RoyalShield : ShieldHelper
     {
         /// <summary>
         /// The Royal glyph only triggers on environmental damage
@@ -19,12 +21,13 @@ namespace EnchantedMask.Helpers.BlockHelpers
 
         /// <summary>
         /// As an Epic glyph, Royal is worth 4 notches. Normally, that would be worth a 29% chance.
+        /// 
         /// Since it only affects hazard damage, its value can be increased. However, you would 
-        ///     realistically only wear this during parkour challenges where there are few, if any,
-        ///     enemies. So it shouldn't be worth much more. I'll go with a 25% boost for now.
+        /// realistically only wear this during parkour challenges where there are few, if any, 
+        /// enemies. So it shouldn't be worth much more. I'll go with a 25% boost for now.
         /// </summary>
         /// <returns></returns>
-        public override bool CustomBlockCheck()
+        public override bool CustomShieldCheck()
         {
             int random = UnityEngine.Random.Range(1, 101);
             return random <= 36;
@@ -36,7 +39,7 @@ namespace EnchantedMask.Helpers.BlockHelpers
         /// <returns></returns>
         public override IEnumerator CustomEffects()
         {
-            SpriteFlash flash = SharedData.GetField<HeroController, SpriteFlash>(HeroController.instance, "spriteFlash");
+            SpriteFlash flash = ClassIntegrations.GetField<HeroController, SpriteFlash>(HeroController.instance, "spriteFlash");
             flash.flashWhitePulse();
 
             yield return base.CustomEffects();

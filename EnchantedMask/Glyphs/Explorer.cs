@@ -1,4 +1,7 @@
-﻿namespace EnchantedMask.Glyphs
+﻿using DanielSteginkUtils.Helpers.Attributes;
+using DanielSteginkUtils.Utilities;
+
+namespace EnchantedMask.Glyphs
 {
     public class Explorer : Glyph
     {
@@ -10,7 +13,7 @@
 
         public override bool Unlocked()
         {
-            return MappedAllRooms();
+            return PlayerValues.BoughtAllMaps();
         }
 
         public override string GetClue()
@@ -19,7 +22,7 @@
             {
                 return "A mapmaker continues his journey across the kingdom.";
             }
-            else if (!MappedAllRooms())
+            else if (!PlayerValues.BoughtAllMaps())
             {
                 return "Your map of the kingdom is incomplete.";
             }
@@ -27,62 +30,37 @@
             return base.GetClue();
         }
 
-        /// <summary>
-        /// Determines if the player has acquired a map of every region
-        /// </summary>
-        /// <returns></returns>
-        private bool MappedAllRooms()
-        {
-            return PlayerData.instance.mapCrossroads &&
-                    PlayerData.instance.mapGreenpath &&
-                    PlayerData.instance.mapFogCanyon &&
-                    PlayerData.instance.mapRoyalGardens &&
-                    PlayerData.instance.mapFungalWastes &&
-                    PlayerData.instance.mapCity &&
-                    PlayerData.instance.mapWaterways &&
-                    PlayerData.instance.mapMines &&
-                    PlayerData.instance.mapDeepnest &&
-                    PlayerData.instance.mapCliffs &&
-                    PlayerData.instance.mapOutskirts &&
-                    PlayerData.instance.mapRestingGrounds &&
-                    PlayerData.instance.mapAbyss;
-        }
-
         public override void Equip()
         {
             base.Equip();
 
-            On.HeroController.Move += SpeedBoost;
+            speedHelper = new SpeedHelper(GetModifier());
+            speedHelper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            On.HeroController.Move -= SpeedBoost;
+            if (speedHelper != null)
+            {
+                speedHelper.Stop();
+            }
         }
 
         /// <summary>
-        /// The Explorer glyph increases movement speed.
+        /// Utils helper
         /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <param name="move_direction"></param>
-        private void SpeedBoost(On.HeroController.orig_Move orig, HeroController self, float move_direction)
-        {
-            move_direction *= GetModifier();
-            //SharedData.Log($"{ID} - Speed increased to {move_direction}");
-            orig(self, move_direction);
-        }
+        private SpeedHelper speedHelper;
 
         /// <summary>
-        /// Explorer is a Common glyph, so its worth 1 notch.
-        /// Sprintmaster increases movement speed by 20% for 1 notch,
-        ///     so this will do the same.
+        /// The Explorer glyph increases the player's movement speed
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
+            // Explorer is a Common glyph, so its worth 1 notch
+            // Sprintmaster increases movement speed by 20% for 1 notch, so this will do the same
             return 1.2f;
         }
     }

@@ -1,4 +1,5 @@
-﻿using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
 using System;
 
 namespace EnchantedMask.Glyphs
@@ -64,15 +65,12 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// As a Common glyph, Crystal should be equivalent to a 1-notch charm.
-        /// CDash is a niche dash, much like DDash.
-        /// Sharp Shadow uses 2 notches to give DDash damage equal to our nail.
-        /// So for 1 notch, Crystal can increase CDash damage by an amount
-        ///     equal to half our current nail damage.
         /// </summary>
         /// <returns></returns>
         internal override int GetBonus(int baseValue)
         {
-            return PlayerData.instance.nailDamage / 2;
+            // Per my Utils, 1 notch is worth half nail damage.
+            return (int)NotchCosts.DashDamagePerNotch();
         }
     }
 }

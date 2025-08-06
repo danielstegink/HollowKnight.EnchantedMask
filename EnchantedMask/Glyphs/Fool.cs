@@ -1,4 +1,7 @@
-﻿namespace EnchantedMask.Glyphs
+﻿using DanielSteginkUtils.Helpers.Attributes;
+using DanielSteginkUtils.Utilities;
+
+namespace EnchantedMask.Glyphs
 {
     public class Fool : Glyph
     {
@@ -31,38 +34,34 @@
         {
             base.Equip();
 
-            On.HeroController.StartMPDrain += SpeedHealing;
+            helper = new HealingSpeedHelper(GetModifier());
+            helper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            On.HeroController.StartMPDrain -= SpeedHealing;
+            if (helper != null)
+            {
+                helper.Stop();
+            }
         }
+
+        /// <summary>
+        /// Utils helper
+        /// </summary>
+        private HealingSpeedHelper helper;
 
         /// <summary>
         /// Fool increases healing speed
         /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <param name="time"></param>
-        private void SpeedHealing(On.HeroController.orig_StartMPDrain orig, HeroController self, float time)
-        {
-            time *= GetModifier();
-            //SharedData.Log($"{ID} - Healing speed set to {time}");
-            orig(self, time);
-        }
-
-        /// <summary>
-        /// As an Epic glyph, Fool is worth 4 notches.
-        /// Quick Focus is worth 3 notches and speeds healing up by 33%,
-        ///     so Fool will increase healing speed by 44%.
-        /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.56f;
+            // As an Epic glyph, Fool is worth 4 notches
+            // Per my Utils, Healing speed can be increased by 11% per notch, so we will increase it by 44%
+            return 1 - 4 * NotchCosts.HealingSpeedPerNotch();
         }
     }
 }

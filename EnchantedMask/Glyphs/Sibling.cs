@@ -1,4 +1,7 @@
-﻿namespace EnchantedMask.Glyphs
+﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
+
+namespace EnchantedMask.Glyphs
 {
     public class Sibling : Glyph
     {
@@ -58,20 +61,22 @@
                 int baseDamage = hitInstance.DamageDealt;
                 int bonusDamage = GetBonus(baseDamage);
                 hitInstance.DamageDealt += bonusDamage;
-                //SharedData.Log($"{ID} - Sharp Shadow damage increased by {bonusDamage}");
+                //SharedData.Log($"{ID} - {baseDamage} damage increased by {bonusDamage}");
             }
 
             orig(self, hitInstance);
         }
 
         /// <summary>
-        /// Sibling is a Common glyph, so its worth 1 notch.
-        /// Sharp Shadow costs 2 notches, so we'll increase its damage by 50%.
+        /// Gets the bonus damage for Sharp Shadow
         /// </summary>
+        /// <param name="baseValue"></param>
         /// <returns></returns>
-        internal override float GetModifier()
+        internal override int GetBonus(int baseValue)
         {
-            return 0.5f;
+            // Sibling is a Common glyph, so its worth 1 notch.
+            // Per my Utils, 1 notch is worth a Dash damage increase equal to 50% nail damage.
+            return (int)NotchCosts.DashDamagePerNotch();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DanielSteginkUtils.Helpers.Attributes;
+using DanielSteginkUtils.Utilities;
 
 namespace EnchantedMask.Glyphs
 {
@@ -29,43 +30,34 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            On.HeroController.AddGeo += AddGeo;
+            helper = new GeoHelper(GetModifier());
+            helper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            On.HeroController.AddGeo -= AddGeo;
+            if (helper != null)
+            {
+                helper.Stop();
+            }
         }
 
         /// <summary>
-        /// The Gold glyph increase geo gained
+        /// Utils helper
         /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <param name="amount"></param>
-        /// <exception cref="NotImplementedException"></exception>
-        private void AddGeo(On.HeroController.orig_AddGeo orig, HeroController self, int amount)
-        {
-            int bonus = GetBonus(amount);
-            amount += bonus;
-            //SharedData.Log($"{ID} - Geo increased by {bonus}");
-            orig(self, amount);
-        }
+        private GeoHelper helper;
 
         /// <summary>
-        /// As a Common glyph, Gold is worth 1 notch.
-        /// Golden Touch is 2 notches, but its initial fragility adjusts its value.
-        /// I have not found a good way to quantify this fragility, so I will
-        ///     assume it gives a 2-notch discount, meaning Unbreakable Greed
-        ///     should cost 4 notches.
-        /// If 4 notches is worth a 20% boost, then 1 notch would be a 5% boost.
+        /// Gold increases geo gained from all sources
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.05f;
+            // As a Common glyph, Gold is worth 1 notch
+            // Per my Utils, Geo gain is worth about 5% per notch
+            return 1 + NotchCosts.GeoPerNotch();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
 using System.Linq;
 using UnityEngine;
 
@@ -62,7 +63,7 @@ namespace EnchantedMask.Glyphs
         {
             orig(self, attackDirection, resetDeathEvent, spellBurn, isWatery);
 
-            EnemyDeathTypes deathType = SharedData.GetField<EnemyDeathEffects, EnemyDeathTypes>(self, "enemyDeathType");
+            EnemyDeathTypes deathType = ClassIntegrations.GetField<EnemyDeathEffects, EnemyDeathTypes>(self, "enemyDeathType");
             EnemyDeathTypes[] validTypes = new EnemyDeathTypes[] 
             { 
                 EnemyDeathTypes.Infected,
@@ -80,7 +81,7 @@ namespace EnchantedMask.Glyphs
                 //SharedData.Log($"{ID} - Checking Essence: {random} vs {essenceChance}");
                 if (random <= essenceChance)
                 {
-                    GameObject dreamPrefab = SharedData.GetField<EnemyDeathEffects, GameObject>(self, "dreamEssenceCorpseGetPrefab");
+                    GameObject dreamPrefab = ClassIntegrations.GetField<EnemyDeathEffects, GameObject>(self, "dreamEssenceCorpseGetPrefab");
                     dreamPrefab.Spawn(self.transform.position + self.effectOrigin);
 
                     PlayerData.instance.dreamOrbs++;

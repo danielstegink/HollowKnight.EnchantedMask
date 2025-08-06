@@ -1,4 +1,7 @@
-﻿namespace EnchantedMask.Glyphs
+﻿using DanielSteginkUtils.Helpers.Abilities;
+using DanielSteginkUtils.Utilities;
+
+namespace EnchantedMask.Glyphs
 {
     public class Dash : Glyph
     {
@@ -27,67 +30,39 @@
         {
             base.Equip();
 
-            BuffDashCooldown();
+            if (dashHelper == null)
+            {
+                dashHelper = new DashHelper(GetModifier(), GetModifier());
+            }
+
+            dashHelper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            ResetDashCooldown();
-        }
-
-        /// <summary>
-        /// Tracks whether or not the buff has been applied;
-        /// </summary>
-        private bool buffApplied = false;
-
-        /// <summary>
-        /// Broken glyph reduces the Dash cooldown
-        /// </summary>
-        private void BuffDashCooldown()
-        {
-            if (!buffApplied)
+            if (dashHelper != null)
             {
-                float modifier = GetModifier();
-                HeroController.instance.DASH_COOLDOWN *= modifier;
-                HeroController.instance.DASH_COOLDOWN_CH *= modifier;
-                HeroController.instance.SHADOW_DASH_COOLDOWN *= modifier;
-                buffApplied = true;
-                //SharedData.Log($"{ID} - Dash cooldown reduced: {HeroController.instance.DASH_COOLDOWN}, " +
-                //                                                $"{HeroController.instance.DASH_COOLDOWN_CH}, " +
-                //                                                $"{HeroController.instance.SHADOW_DASH_COOLDOWN}");
+                dashHelper = new DashHelper(GetModifier(), GetModifier());
+                dashHelper.Stop();
             }
         }
 
         /// <summary>
-        /// Of course, we need to reset the cooldowns when the glyph is removed
+        /// Utils helper
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        private void ResetDashCooldown()
-        {
-            if (buffApplied)
-            {
-                float modifier = GetModifier();
-                HeroController.instance.DASH_COOLDOWN /= modifier;
-                HeroController.instance.DASH_COOLDOWN_CH /= modifier;
-                HeroController.instance.SHADOW_DASH_COOLDOWN /= modifier;
-                buffApplied = false;
-                //SharedData.Log($"{ID} - Dash cooldown reset: {HeroController.instance.DASH_COOLDOWN}, " +
-                //                                                $"{HeroController.instance.DASH_COOLDOWN_CH}, " +
-                //                                                $"{HeroController.instance.SHADOW_DASH_COOLDOWN}");
-            }
-        }
+        private DashHelper dashHelper;
 
         /// <summary>
-        /// As a Common glyph, Dash is worth 1 notch.
-        /// Dashmaster is worth 2 notches and reduces Dash
-        ///     cooldown by 33%, so Dash will do 16.5%.
+        /// The Dash glyph reduces the cooldown of dash abilities
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.835f;
+            // As a Common glyph, Dash is worth 1 notch.
+            // Per my Utils, 1 notch is worth a 16.5% decrease in dash cooldown
+            return 1 - NotchCosts.GetDashCooldownPerNotch();
         }
     }
 }

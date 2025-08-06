@@ -1,4 +1,4 @@
-﻿namespace EnchantedMask.Glyphs
+﻿ namespace EnchantedMask.Glyphs
 {
     public class Old : Glyph
     {
@@ -52,6 +52,11 @@
         /// </summary>
         private float timeScale = -1f;
 
+        /// <summary>
+        /// The Old glyph slows down time
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
         private void SlowTime(On.HeroController.orig_Update orig, HeroController self)
         {
             //SharedData.Log($"Current time scale: {TimeController.GenericTimeScale}");
@@ -60,19 +65,25 @@
                 timeScale = TimeController.GenericTimeScale;
             }
 
-            TimeController.GenericTimeScale = timeScale * GetModifier();
-            //SharedData.Log($"{ID} - Time scale set to {TimeController.GenericTimeScale}");
+            // If we don't add this check, the game will get screwy while the pause menu is up
+            if (!GameManager.instance.isPaused)
+            {
+                TimeController.GenericTimeScale = timeScale * GetModifier();
+                //SharedData.Log($"{ID} - Time scale set to {TimeController.GenericTimeScale}");                
+            }
+
             orig(self);
         }
 
         /// <summary>
-        /// Old is an Uncommon glyph, so its worth 2 notches.
-        /// There is no in-game precedent for slowing time to give players more response time.
-        /// I'm going to trust in Fyrenest, which has a 2-notch charm that slows time to 60%.
+        /// Gets the modifier for time dilation
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
+            // Old is an Uncommon glyph, so its worth 2 notches.
+            // There is no in-game precedent for slowing time to give players more response time.
+            // I'm going to trust in Fyrenest, which has a 2-notch charm that slows time to 60%.
             return 0.6f;
         }
     }

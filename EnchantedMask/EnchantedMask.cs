@@ -16,7 +16,7 @@ namespace EnchantedMask
 {
     public class EnchantedMask : Mod, ILocalSettings<SaveSettings>
     {
-        public override string GetVersion() => "1.1.1.0";
+        public override string GetVersion() => "1.2.0.0";
 
         #region Settings
         public void OnLoadLocal(SaveSettings s)
@@ -43,6 +43,7 @@ namespace EnchantedMask
                 ("Fungus1_04_boss", "Hornet Boss 1/Sphere Ball"),
                 ("GG_Uumuu", "Mega Jellyfish GG"),
                 ("RestingGrounds_08", "Ghost revek"),
+                ("Crossroads_04", "_Enemies/Zombie Hornhead")
                 //("Abyss_06_Core", "Shade Sibling Spawner")
             };
         }
@@ -83,6 +84,8 @@ namespace EnchantedMask
                                                         .First();
                 glyph.Equip();
             }
+
+            orig(self);
         }
 
         private IEnumerator OnQuit(On.GameManager.orig_ReturnToMainMenu orig, GameManager self, GameManager.ReturnToMainMenuSaveModes saveMode, Action<bool> callback)

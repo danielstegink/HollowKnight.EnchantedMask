@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
+using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -65,28 +67,27 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// As a Common glyph, Blue is worth 1 notch.
-        /// Deep Focus is 4 notches and heals an extra mask (I know it says double, but 1X2 is just +1)
-        ///     in exchange for an increased healing time of 165%. Reducing this back to 100% would require
-        ///     a 40% reduction in healing speed.
-        /// Quick Focus reduces healing time by 33% for 3 notches, based on this logic,
-        ///     the increased healing time from Deep Focus is worth about 4 notches.
-        /// This means healing an extra mask is worth 8 notches, so Blue should have a 1/8 chance of
-        ///     healing an extra mask.
-        /// Lifeblood masks are less valuable than regular masks because you can't heal them back, so 
-        ///     the odds can be improved. 
-        /// Lifeblood Heart gives 2 masks for 2 notches and Lifeblood Core gives 4 notches for 3, so 
-        ///     1 notch is worth about 1.5 lifeblood masks.
-        /// In comparison, Fragile Heart gives 2 regular masks for 2 notches, but its fragile status
-        ///     means its worth about 2 extra notches, making 1 notch worth 1/2 of a regular mask.
-        /// If 1 mask is worth about 3 lifeblood masks, then we can increase the healing chance from
-        ///     1/8 to 3/8.
-        /// To add some synergy, lets round down a little in exchange for lifeblood charms increasing
-        ///     the probability.
         /// </summary>
         /// <returns></returns>
         internal int GetHealChance()
         {
-            int healChance = 34;
+            // Per my Utils, healing an extra mask is worth 8 notches.
+            float chance = 100f / NotchCosts.NotchesPerHeal();
+            //SharedData.Log($"{ID} - Chance of healing 1 mask: {chance}");
+
+            // However, a Lifeblood mask is worth 3/4 of a notch while a regular Mask is worth 2 notches
+            // That makes a Lifeblood mask worth about 0.375 Masks
+            float lifebloodPerMask = NotchCosts.NotchesPerBlueMask() / NotchCosts.NotchesPerMask();
+            //SharedData.Log($"{ID} - 1 mask is worth {lifebloodPerMask} lifeblood masks");
+
+            // That means the value of healing a Lifeblood masks is 0.375 * 8 = 3 notches
+            // So for 1 notch we should have a 1/3 chance of getting a Lifeblood mask upon healing
+            int healChance = (int)(chance / lifebloodPerMask);
+            //SharedData.Log($"{ID} - Chance of healing 1 lifeblood mask: {healChance}");
+
+            // To add some fun synergy, we'll reduce the odds slightly and increase the chance for
+            // each Lifeblood charm equipped
+            healChance -= 3;
 
             if (PlayerData.instance.equippedCharm_8)
             {

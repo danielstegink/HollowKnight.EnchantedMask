@@ -1,4 +1,5 @@
-﻿using EnchantedMask.Helpers.GlyphHelpers;
+﻿using DanielSteginkUtils.Helpers.Charms.Dung;
+using EnchantedMask.Settings;
 
 namespace EnchantedMask.Glyphs
 {
@@ -29,37 +30,38 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            dungTrailHelper = new DungTrailHelper(ID, GetModifier());
-            dungTrailHelper.Start();
+            helper = new DungSizeHelper(SharedData.modName, ID, GetModifier());
+            helper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            if (dungTrailHelper != null)
+            if (helper != null)
             {
-                dungTrailHelper.Stop();
+                helper.Stop();
             }
         }
 
         /// <summary>
-        /// Used for handling size of Defender's Crest clouds
+        /// Utils helper
         /// </summary>
-        private DungTrailHelper dungTrailHelper;
+        private DungSizeHelper helper;
 
         /// <summary>
-        /// As an Uncommon glyph, Brown is worth 2 notches.
-        /// So Defender's Crest would be worth 3 notches, equivalent to tripling its damage rate.
-        /// Tripling the damage rate could mean increasing the damage speed, but it can also mean
-        ///     increasing the range to hit triple the enemies.
-        /// The size of the cloud, which only slightly extends past the player, can typically
-        ///     accomodate only 1 enemy.
-        /// For the cloud to accomodate 3x the enemies, assuming the enemies surround the player,
-        ///     doubling the size of the cloud seems appropriate.
+        /// The Brown glyph increases the size of clouds created by Defender's Crest
         /// </summary>
         internal override float GetModifier()
         {
+            // As an Uncommon glyph, Brown is worth 2 notches
+            // So Defender's Crest would be worth 3 notches, equivalent to tripling its damage rate.
+            // Tripling the damage rate could mean increasing the damage speed, but it can also
+            // mean increasing the range to hit triple the enemies.
+
+            // The size of the cloud, which only slightly extends past the player, can typically accomodate only 1 enemy.
+            // For the cloud to accomodate 3x the enemies, assuming the enemies surround the player,
+            // doubling the size of the cloud seems appropriate.
             return 2f;
         }
     }

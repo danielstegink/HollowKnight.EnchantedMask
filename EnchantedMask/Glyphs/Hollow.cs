@@ -39,19 +39,18 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            selfStab.ApplyHook();
+            selfStab.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            selfStab.RemoveHook();
+            selfStab.Stop();
         }
 
         /// <summary>
-        /// Handles damage negation for the Hollow glyph inspired by 
-        ///     the Hollow Knight's Self Stab ability.
+        /// Utils helper
         /// </summary>
         private SelfStab selfStab = new SelfStab();
     }

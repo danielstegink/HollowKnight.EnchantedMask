@@ -13,16 +13,16 @@ namespace EnchantedMask.Glyphs
 
         public override bool Unlocked()
         {
-            return PlayerData.instance.hegemolDefeated;
+            return PlayerData.instance.GetBool("hegemolDefeated");
         }
 
         public override string GetClue()
         {
-            if (!PlayerData.instance.hasDreamNail)
+            if (!PlayerData.instance.GetBool("hasDreamNail"))
             {
                 return "The power of a forgotten tribe waits in the graveyard of heroes.";
             }
-            else if (!PlayerData.instance.hegemolDefeated)
+            else if (!PlayerData.instance.GetBool("hegemolDefeated"))
             {
                 return "The Beast sleeps in the depths of her Den.";
             }
@@ -45,9 +45,7 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// The Beast glyph is Uncommon, so its worth 2 notches. 
-        /// Weaversong is a 2 notch charm, so we can justify 
-        ///     doubling the number of weaverlings.
+        /// The Beast glyph increases the number of weaverlings produced by Weaversong
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns></returns>
@@ -55,13 +53,15 @@ namespace EnchantedMask.Glyphs
         {
             if (gameObject.name.Contains("Weaverling"))
             {
+                // Beast is an Uncommon glyph, so its worth 2 notches
+                // Weaversong is a 2 notch charm, so we can justify doubling the number of weaverlings
                 _ = GameObject.Instantiate(gameObject,
                     new Vector3(HeroController.instance.transform.GetPositionX(),
                     HeroController.instance.transform.GetPositionY()),
                     Quaternion.identity);
+                //SharedData.Log($"{ID} - Extra weaverlings spawned");
             }
 
-            //SharedData.Log($"{ID} - Extra weaverlings spawned");
             return gameObject;
         }
     }

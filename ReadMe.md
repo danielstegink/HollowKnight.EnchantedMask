@@ -8,7 +8,7 @@ Each glyph has been assigned a tier based on how difficult it is to unlock. High
  - Uncommon glyphs are a little harder, roughly mid-game difficulty. They cost 1000 geo and are as powerful as 2-notch charms.
  - Rare glyphs are challenging, generally acquired in late game. They cost 2000 geo and are as powerful as 3-notch charms.
  - Epic glyphs are end-game difficulty. They cost 4000 geo and are as powerful as 4-notch charms.
- - Legendary glyphs are considered the greatest challenges in the game. They cost 8000 geo and are as valuable as 5-notch charms.
+ - Legendary glyphs are considered the greatest challenges in the game. They cost 8000 geo and are as powerful as 5-notch charms.
 
 The Glyphs page in your inventory will show all the glyphs you've acquired. 
 The logic for equipping/unequipping a glyph is the same as that of charms. A sound effect will play each time.
@@ -23,6 +23,20 @@ Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs 
 Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
 
 ## Patch Notes
+1.2.0.0
+- Integrated with DanielSteginkUtils
+- Reduced chance of Life triggering
+- Dream deals less damage and uses more Essence
+- Loneliness and Sorcery deal more damage
+- Childhood gives more SOUL
+- Sacrifice, Protection, Friendship and King integrate with Stalwart Shell
+- Hunter and Mourning deal less damage
+- Leadership gives a smaller range bonus
+- Game should pause properly even with Wisdom equipped
+- Light uses a more pronounced visual effect
+- Betrayal doesn't affect Nail Arts
+- Deceit doesn't affect Combo Stagger
+
 1.1.1.0
 - Fixed Love's icon to be the correct color
 - Modified save logic so glyph effects don't persist after closing the game

@@ -1,4 +1,6 @@
-﻿using EnchantedMask.Helpers.GlyphHelpers;
+﻿using DanielSteginkUtils.Helpers.Charms.Dung;
+using EnchantedMask.Helpers.GlyphHelpers;
+using EnchantedMask.Settings;
 
 namespace EnchantedMask.Glyphs
 {
@@ -39,44 +41,57 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            dungTrailHelper = new DungTrailHelper(ID, GetSizeModifier(), GetModifier());
-            dungTrailHelper.Start();
+            sizeHelper = new DungSizeHelper(SharedData.modName, ID, GetSizeModifier());
+            sizeHelper.Start();
+
+            damageHelper = new DungDamageHelper(SharedData.modName, ID, 1 / GetModifier());
+            damageHelper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            if (dungTrailHelper != null)
+            if (sizeHelper != null)
             {
-                dungTrailHelper.Stop();
+                sizeHelper.Stop();
+            }
+
+            if (damageHelper != null)
+            {
+                damageHelper.Stop();
             }
         }
 
         /// <summary>
-        /// Used for handling size of Defender's Crest clouds
+        /// Cloud size helper
         /// </summary>
-        private DungTrailHelper dungTrailHelper;
+        private DungSizeHelper sizeHelper;
 
         /// <summary>
-        /// White is a Rare glyph worth 3 notches, but it has 2 features: size boost, and damage boost.
-        /// The size boost is more convenient, so we will use only 1 notch for that, so Brown is still viable.
-        /// Per Brown, 1 notch is worth a 50% size increase.
+        /// Cloud damage helper
+        /// </summary>
+        private DungDamageHelper damageHelper;
+
+        /// <summary>
+        /// White is a Rare glyph worth 3 notches.
+        /// It uses 1 notch to increase the size of the dung clouds.
         /// </summary>
         /// <returns></returns>
         private float GetSizeModifier()
         {
+            // Per Brown, 1 notch is worth a 50% size increase
             return 1.5f;
         }
 
         /// <summary>
-        /// We used 1 notch to increase the cloud's size, so we have 2 notches left to modify damage.
-        /// Defender's Crest is only worth 1 notch normally, so we can increase its damage rate by 200%.
+        /// White spends 2 notches increasing the damage rate of dung clouds.
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 1f / 3f;
+            // Defender's Crest is worth 1 notch, so we can increase its damage rate by 200%
+            return 3f;
         }
     }
 }

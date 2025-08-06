@@ -1,7 +1,6 @@
-﻿using HutongGames.PlayMaker;
-using Modding;
-using System.Linq;
-using UnityEngine;
+﻿using DanielSteginkUtils.Helpers.Attributes;
+using DanielSteginkUtils.Utilities;
+using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -32,56 +31,34 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            ModHooks.OnEnableEnemyHook += ExtraStagger;
+            staggerHelper = new StaggerHelper(Modifier());
+            staggerHelper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            ModHooks.OnEnableEnemyHook -= ExtraStagger;
+            if (staggerHelper != null)
+            {
+                staggerHelper.Stop();
+            }
         }
 
         /// <summary>
-        /// False reduces the number of hits required to stagger a boss.
-        /// For 2 notches, Heavy Blow reduces stagger by 1 and increases knockback.
-        /// So we can reduce stagger by 1 for 1 notch.
+        /// Utils helper
         /// </summary>
-        /// <param name="enemy"></param>
-        /// <param name="isAlreadyDead"></param>
+        private StaggerHelper staggerHelper;
+
+        /// <summary>
+        /// The False glyph reduces the number of hits required to stagger an enemy
+        /// </summary>
         /// <returns></returns>
-        private bool ExtraStagger(GameObject enemy, bool isAlreadyDead)
+        private int Modifier()
         {
-            // If the enemy is already dead, no need to adjust the stagger rate
-            if (isAlreadyDead)
-            {
-                return isAlreadyDead;
-            }
-
-            // Get the Stun or Stun Control FSM
-            PlayMakerFSM stunFsm = enemy.LocateMyFSM("Stun");
-            if (stunFsm == null)
-            {
-                stunFsm = enemy.LocateMyFSM("Stun Control");
-                if (stunFsm == null)
-                {
-                    //SharedData.Log("This enemy cannot be staggered.");
-                    return isAlreadyDead;
-                }
-            }
-
-            // Get the Heavy Blow state of the FSM
-            FsmState heavyBlowState = stunFsm.FsmStates.FirstOrDefault(x => x.Name.Equals("Heavy Blow"));
-            if (heavyBlowState == default)
-            {
-                return isAlreadyDead;
-            }
-
-            // The FSM will have 2 values of note: Stun Combo and Stun Hit Max. Both need to be reduced
-            stunFsm.FsmVariables.FindFsmInt("Stun Hit Max").Value--;
-            stunFsm.FsmVariables.FindFsmInt("Stun Combo").Value--;
-
-            return isAlreadyDead;
+            // False is a Common glyph worth 1 notch
+            // Per my Utils, 1 notch is worth 1 point of stagger
+            return Math.Max(1, 1 / NotchCosts.NotchesPerStagger());
         }
     }
 }

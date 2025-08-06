@@ -1,5 +1,4 @@
-﻿using EnchantedMask.Helpers.GlyphHelpers;
-using EnchantedMask.Helpers.GlyphHelpers.Components;
+﻿using EnchantedMask.Helpers.GlyphHelpers.Components;
 using EnchantedMask.Settings;
 using GlobalEnums;
 using HutongGames.PlayMaker.Actions;
@@ -60,15 +59,16 @@ namespace EnchantedMask.Glyphs
         private void CreatePrefab()
         {
             // Get lightning swarm from preloads
-            GameObject preload = SharedData.preloads["GG_Uumuu"]["Mega Jellyfish GG"]
-                                             .LocateMyFSM("Mega Jellyfish")
-                                            .GetAction<SpawnObjectFromGlobalPool>("Gen", 2).gameObject.Value;
-            preload.layer = (int)PhysLayers.HERO_ATTACK;
-            Satchel.GameObjectUtils.RemoveComponent<DamageHero>(preload);
-            preload.AddComponent<LumaflyDamage>();
+            GameObject preload = SharedData.preloads["GG_Uumuu"]["Mega Jellyfish GG"];
+            PlayMakerFSM fsm = preload.LocateMyFSM("Mega Jellyfish");
+            SpawnObjectFromGlobalPool spawnAction = fsm.GetAction<SpawnObjectFromGlobalPool>("Gen", 2);
+            GameObject lumaflies = spawnAction.gameObject.Value;
+            lumaflies.layer = (int)PhysLayers.HERO_ATTACK;
+            Satchel.GameObjectUtils.RemoveComponent<DamageHero>(lumaflies);
+            lumaflies.AddComponent<LumaflyDamage>();
 
             // Copy preload into a prefab, then disable it so it doesn't shock us
-            prefab = UnityEngine.GameObject.Instantiate(preload);
+            prefab = UnityEngine.GameObject.Instantiate(lumaflies);
             prefab.name = "EnchantedMask.Lumaflies";
             prefab.SetActive(false);
             UnityEngine.GameObject.DontDestroyOnLoad(prefab);
@@ -83,7 +83,7 @@ namespace EnchantedMask.Glyphs
             while (IsEquipped())
             {
                 // Get the closest enemy
-                GameObject closestEnemy = GetEnemyHelper.GetNearestEnemy();
+                GameObject closestEnemy = DanielSteginkUtils.Helpers.GetEnemyHelper.GetNearestEnemy();
                 if (closestEnemy != null)
                 {
                     Vector3 target = closestEnemy.gameObject.transform.position;
@@ -98,7 +98,7 @@ namespace EnchantedMask.Glyphs
                     yield return new WaitForSeconds(2f);
                 }
 
-                yield return new WaitForSeconds(0f);
+                yield return new WaitForSeconds(Time.deltaTime);
             }
         }
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DanielSteginkUtils.Utilities;
+using System;
 using System.Collections.Generic;
 
 namespace EnchantedMask.Glyphs
@@ -87,14 +88,14 @@ namespace EnchantedMask.Glyphs
         }
 
         /// <summary>
-        /// Grey is an Epic glyph worth 4 notches.
-        /// Flukenest, a 3-notch charm, boosts VS damage by about 100%,
-        ///     so Grey boost Dive by 133%.
+        /// Gets the Dive spell damage modifier
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 4f / 3f;
+            // Grey is an Epic glyph worth 4 notches.
+            // Per my Utils, this is worth a 200% increase in the damage of a single spell.
+            return 4f * NotchCosts.SingleSpellDamagePerNotch();
         }
 
         /// <summary>

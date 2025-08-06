@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DanielSteginkUtils.Utilities;
+using System.Collections;
 using UnityEngine;
 
 namespace EnchantedMask.Glyphs
@@ -67,17 +68,17 @@ namespace EnchantedMask.Glyphs
 
         /// <summary>
         /// The Snail glyph gives passive SOUL regeneration, like Kingsoul.
-        /// Snail is an Uncommon glyph, making it worth 2 notches.
-        /// Kingsoul gives 4 SOUL every 2 seconds for 5 notches, averaging 2 SOUL per second.
-        /// So Snail will give 1 SOUL every 1.25 seconds.
         /// </summary>
         /// <returns></returns>
         private IEnumerator GiveSoul()
         {
             while (IsEquipped())
             {
+                // Snail is an Uncommon glyph, making it worth 2 notches.
+                // Per my Utils, 1 notch is worth 1 SOUL every 2.5 seconds
+                // So Snail will give 1 SOUL every 1.25 seconds
                 HeroController.instance.AddMPCharge(1);
-                yield return new WaitForSeconds(1.25f);
+                yield return new WaitForSeconds(NotchCosts.PassiveSoulTime() / 2);
                 //SharedData.Log($"{ID} - 1 SOUL added");
             }
         }

@@ -1,4 +1,7 @@
-﻿using GlobalEnums;
+﻿using DanielSteginkUtils.Helpers.Libraries;
+using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
+using GlobalEnums;
 using System;
 using UnityEngine;
 
@@ -63,28 +66,29 @@ namespace EnchantedMask.Glyphs
         /// <exception cref="NotImplementedException"></exception>
         private void Grubsong(On.HeroController.orig_TakeDamage orig, HeroController self, GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
-            orig(self, go, damageSide, damageAmount, hazardType);
-
             if (PlayerData.instance.equippedCharm_3 &&
-                damageAmount > 0)
+                Logic.CanTakeDamage(damageAmount, hazardType))
             {
                 float baseSoul = self.GRUB_SOUL_MP;
                 int newSoul = (int)Math.Floor(baseSoul * GetGrubsongModifier());
-                self.AddMPCharge(newSoul);
-                //SharedData.Log($"Grub - Soul increased by {newSoul}");
+                SoulHelper.GainSoul(newSoul, false);
             }
+
+            orig(self, go, damageSide, damageAmount, hazardType);
         }
 
         /// <summary>
-        /// As a Rare glyph, Grub is worth 3 notches. However, it affects 2 charms. As such, 
-        ///     each charm will receive 75% of the bonus it usually would.
-        /// Grubsong grants 15 SOUL when damaged for 1 notch, so Grub will increase this to 
-        ///     15 * 3 * 0.75 = 33.75 SOUL, rounded down to 33.
+        /// Gets the modifier for Grubsong
         /// </summary>
         /// <returns></returns>
         internal float GetGrubsongModifier()
         {
-            return 1.25f;
+            // As a Rare glyph, Grub is worth 3 notches.However, it affects 2 charms.
+            // As such, each charm will receive 75% of the bonus it usually would.
+
+            // Grubsong grants 15 SOUL when damaged for 1 notch, so Grub will increase 
+            // this to 15 * 3 * 0.75 = 33.75 SOUL, rounded down to 33.
+            return 2.25f;
         }
 
         /// <summary>
@@ -97,33 +101,34 @@ namespace EnchantedMask.Glyphs
         {
             if (hitInstance.Source.name.Contains("Grubberfly"))
             {
-                int bonusDamage = GetBonus(hitInstance.DamageDealt);
+                int baseDamage = hitInstance.DamageDealt;
+                int bonusDamage = GetBonus(baseDamage);
                 hitInstance.DamageDealt += bonusDamage;
-                //SharedData.Log($"Grub - Elegy damage increased by {bonusDamage}");
+                //SharedData.Log($"{ID} - {baseDamage} damage increased by {bonusDamage}");
             }
 
             orig(self, hitInstance);
         }
 
         /// <summary>
-        /// For 3 notches, Grubberfly's Elegy adds an extra attack with 50% damage
-        ///     and roughly 300% range while at full health.
-        /// If 1 notch is worth a 10% increase in nail damage, the damage boost is worth 5 notches.
-        /// Additionally, MOP increases range by 25% for 3 notches, so a 200% increase in range
-        ///     is worth about 24 notches. However, this only applies to the Elegy beam which
-        ///     only deals 1/3 of the total damage, so that drops the bonus down to 8 notches.
-        ///     Let's say 7 since the travel time means the beam can miss.
-        /// So the extra damage (and the extra range on that damage) is worth about 12 notches.
-        ///     But requiring us to be at fully health reduces the value to 3 notches.
-        /// So, the 2.25 notch boost should be multiplied by 4 to 9 notches, which is worth
-        ///     a roughly 90% increase in nail damage on top of the original 50% for a total of
-        ///     140%.
+        /// Gets the damage modifier for Grubberfly's Elegy
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            // 0.5 + 0.5x = 1.4, X = 1.8
-            return 1.8f;
+            // Per my Utils, Grubberfly's Elegy costs only 1/4 of its actual value due to its Full Health requirement.
+            // So the 2.25 notches we use to modify its damage get multipled to 9.
+            float notchValue = 3 * 0.75f * NotchCosts.FullHealthModifier();
+
+            // So we need to increase damage dealt by Elegy beams by 90%, for a total of 140%
+            float glyphModifier = NotchCosts.NailDamagePerNotch() * notchValue;
+            float totalModifier = 0.5f + glyphModifier;
+
+            // 0.5 + 0.5x = 1.4, x = 1.8
+            float modifier = (totalModifier - 0.5f) / 0.5f;
+            //SharedData.Log($"{ID} - Elegy modifier: {modifier}");
+
+            return modifier;
         }
     }
 }

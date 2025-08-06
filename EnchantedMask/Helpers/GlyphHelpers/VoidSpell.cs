@@ -87,7 +87,7 @@ namespace EnchantedMask.Helpers.GlyphHelpers
                     }
 
                     // Get the nearest enemy
-                    GameObject closestEnemy = GetEnemyHelper.GetNearestEnemy();
+                    GameObject closestEnemy = DanielSteginkUtils.Helpers.GetEnemyHelper.GetNearestEnemy();
                     if (closestEnemy != null)
                     {
                         Vector3 target = closestEnemy.gameObject.transform.position;

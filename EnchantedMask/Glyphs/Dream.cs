@@ -1,7 +1,7 @@
-﻿using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Helpers.Attributes;
+using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
 using System;
-using System.Linq;
-using UnityEngine;
 
 namespace EnchantedMask.Glyphs
 {
@@ -46,7 +46,6 @@ namespace EnchantedMask.Glyphs
             On.EnemyDreamnailReaction.RecieveDreamImpact -= DreamAttack;
         }
 
-
         /// <summary>
         /// The Dream glyph spends Essence to deal damage to enemies upon Dream Nail hit
         /// </summary>
@@ -62,92 +61,80 @@ namespace EnchantedMask.Glyphs
             HealthManager enemy = self.gameObject.GetComponent<HealthManager>();
             if (enemy != default)
             {
-                // Calculate the amount of damage to deal and how much Essence to use
-                int essenceSpent = GetEssence();
-                if (essenceSpent > 0)
+                // Get the theoretical max damage we wish to do
+                float maxDamage = GetMaxDamage();
+
+                // Get how much essence we wish to spend
+                int essence = GetEssence(maxDamage);
+                if (essence > 0)
                 {
-                    // Calculate the damage
-                    float damagePerSoul = GetDamagePerSoul();
-                    float soulPerEssence = GetSoulPerEssence();
-                    float damage = damagePerSoul * soulPerEssence * essenceSpent;
-                    int damageInt = (int)Math.Round(damage);
+                    // Calculate the true damage
+                    float soul = essence * Calculations.SoulPerEssence();
+                    float damage = soul * Calculations.DamagePerSoul(Calculations.SpellType.AbyssShriek);
+                    //SharedData.Log($"{ID} - {essence} -> {soul} SOUL -> {damage} damage");
 
-                    // Set up a spell attack
-                    HitInstance dreamHit = new HitInstance
-                    {
-                        DamageDealt = damageInt,
-                        AttackType = AttackTypes.Spell,
-                        IgnoreInvulnerable = true,
-                        Source = HeroController.instance.gameObject,
-                        Multiplier = 1f
-                    };
+                    // Perform a spell attack to do the damage
+                    DamageHelper.DealDamage(enemy, (int)damage, AttackTypes.Spell, HeroController.instance.gameObject);
 
-                    // Deal the damage
-                    enemy.Hit(dreamHit);
-                    //SharedData.Log($"{ID} - {damageInt} damage dealt for {essenceSpent} Essence");
-
-                    // Remove the essence from our inventory and add them as 
-                    // essence spent so the game knows to increase the chance of 
-                    // us getting more
-                    PlayerData.instance.dreamOrbs -= essenceSpent;
-                    PlayerData.instance.dreamOrbsSpent += essenceSpent;
+                    // Lastly, change the Essence counts in our player data so the game knows to adjust the drop rate
+                    PlayerData.instance.dreamOrbs -= essence;
+                    PlayerData.instance.dreamOrbsSpent += essence;
                 }
             }
         }
 
         /// <summary>
-        /// Dream effectively adds a spell cast to the Dream Nail,
-        ///     so we need to pick a spell and calculate damage based
-        ///     on it.
+        /// Dream effectively adds a spell cast to the Dream Nail, so we need to 
+        /// calculate the upper limit of how much damage we want to do
         /// </summary>
         /// <returns></returns>
-        internal float GetDamagePerSoul()
+        private float GetMaxDamage()
         {
-            // Dream uses Essence to deal extra damage when it normally wouldn't deal any.
-            // For 2 notches, Glowing Womb uses 8 SOUL to deal 9 extra damage every 4 seconds.
-            //      That's 1.125 damage per SOUL per second per notch.
-            // Dream is an Uncommon glyph worth 2 notches. Additionally, this damage
-            //      only applies when using a Dream Nail, which takes 1.75 seconds to charge.
-            // That means we should deal 3.9375 damage per SOUL.
-            return 3.938f;
+            // Dream is an Uncommon glyph worth 2 notches
+            // Dream Nail does no damage of its own, so we will use others to build a base
+            // Per my Utils, we know that would be worth 20% nail damage, or 4 damage assuming Pure Nail
+            float nailDamage = 2 * NotchCosts.NailDamagePerNotch() * PlayerData.instance.nailDamage;
+            //SharedData.Log($"{ID} - Nail damage: {nailDamage}");
+
+            // However, Dream Nail takes much longer than a regular nail attack, so its damage should be inflated
+            // Per my Utils, Dream Nail should deal 4.26 times as much damage, for a total of about 17 damage
+            float dreamNailDamage = Calculations.NailDamageToDreamNailDamage(nailDamage);
+            //SharedData.Log($"{ID} - Dream Nail damage: {dreamNailDamage}");
+
+            // Dream uses Essence like SOUL to deal damage, so we should actually treat this like a spell attack
+            // Per my Utils, spell damage is 2.73 times as valuable as nail damage, meaning we want to hit for about 47 damage
+            float spellDamage = Calculations.NailDamageToSpellDamage(dreamNailDamage);
+            //SharedData.Log($"{ID} - Spell damage: {spellDamage}");
+
+            return spellDamage;
         }
 
         /// <summary>
-        /// Determines how much SOUL 1 Essence is worth
+        /// Determines how much Essence to spend on damage
         /// </summary>
+        /// <param name="damage"></param>
         /// <returns></returns>
-        private float GetSoulPerEssence()
+        private int GetEssence(float damage)
         {
-            // Normally the user gets 11 SOUL per nail attack. Assuming the enemy can survive
-            //      3 nail attacks (about 60 HP w/ Pure Nail), thats 33 SOUL per enemy.
-            // In comparison, Essence has a drop rate of 1 per 300 enemes. Now, this glyph
-            //      will result in us spending a lot of Essence, so the ratio will increase to
-            //      1 per 60 enemies.
-            // On paper, this makes it very valuable. However, we use SOUL constantly and 
-            //      use Essence practically never, so it makes sense to seriously adjust
-            //      the value.
-            // I'm thinking Essence should be only 1% as valuable, since we only ever use it for
-            //      Dream Gates.
-            // 33 * 60 / 100 = 19.8
-            return 19.8f;
-        }
+            // The damage is based on the Abyss Shriek spell, so we can use its Damage per SOUL to
+            // calculate how much SOUl this kind of damage would cost, about 26 SOUL in total
+            float soul = damage / Calculations.DamagePerSoul(Calculations.SpellType.AbyssShriek);
+            //SharedData.Log($"{ID} - SOUL for {damage} damage: {soul}");
 
-        /// <summary>
-        /// Determines how much Essence to spend on extra damage
-        /// </summary>
-        /// <returns></returns>
-        private int GetEssence()
-        {
-            // Dream uses Essence to deal extra damage when it normally wouldn't deal any.
-            // So, how much SOUL would we spend for 1 notch?
-            // DN is like a Nail Art, so we're adding a Spell to a Nail Art.
-            // For 2 notches, Glowing Womb uses 8 SOUL to deal 9 extra damage every 4 seconds.
-            //      That's 1 SOUL per second per notch.
-            // Dream Nail takes 1.75 seconds to attack, and Dream is worth 2 notches, so
-            //      we would spend 3.5 SOUL.
-            // But we need to spend at least 1 Essence, so we'll spend 1 Essence for 19.8 SOUL.
-            // DN is hard to pull off anyway, so this is probably fine.
-            return Math.Min(1, PlayerData.instance.dreamOrbs);
+            // Per my Utils, 1 Essence is worth about 20 SOUL
+            float essence = soul / Calculations.SoulPerEssence();
+            //SharedData.Log($"{ID} - Essence for {soul} SOUL: {essence}");
+
+            // If my math is right, we will want to spend about 1 Essence, but to make things fun I will round up to 2
+            // To be safe, we want to make sure we try to spend at least 1 Essence
+            int essenceToSpend = Math.Max(1, (int)Math.Ceiling(essence));
+            //SharedData.Log($"{ID} - Max essence to spend: {essenceToSpend}");
+
+            // Lastly, make sure we have that much essenceToSpend
+            essenceToSpend = Math.Min(essenceToSpend, PlayerData.instance.dreamOrbs);
+            //SharedData.Log($"{ID} - Essence to spend: {essenceToSpend}");
+
+            return essenceToSpend;
         }
     }
 }

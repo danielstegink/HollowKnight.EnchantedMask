@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
+using System;
 
 namespace EnchantedMask.Glyphs
 {
@@ -50,23 +52,29 @@ namespace EnchantedMask.Glyphs
         {
             if (PlayerData.instance.health == PlayerData.instance.CurrentMaxHealth)
             {
-                int bonusDamage = GetBonus(hitInstance.DamageDealt);
+                int baseDamage = hitInstance.DamageDealt;
+                int bonusDamage = GetBonus(baseDamage);
                 hitInstance.DamageDealt += bonusDamage;
-                //SharedData.Log($"{ID} - Damage increased by {bonusDamage}");
+                //SharedData.Log($"{ID} - {baseDamage} damage increased by {bonusDamage}");
             }
 
             orig(self, hitInstance);
         }
 
         /// <summary>
-        /// As a Rare glyph, Sad is worth 3 notches.
-        /// Per Hunter, 3 notches is a 22.5% damage boost.
-        /// However, per Grub, requiring full health makes a bonus 4 times as valuable.
+        /// Gets the damage modifier
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 0.9f;
+            // As a Rare glyph, Sad is worth 3 notches.
+            // Per my Utils, a universal damage buff should be 6.67% per notch.
+            // Per my Utils, however, requiring full health makes a bonus 4 times as valuable,
+            // for a total of about 80%
+            float modifier = 3f * NotchCosts.DamagePerNotch() * NotchCosts.FullHealthModifier();
+            //SharedData.Log($"{ID} - Damage modifier: {modifier}");
+
+            return modifier;
         }
     }
 }

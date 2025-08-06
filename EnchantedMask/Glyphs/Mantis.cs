@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using EnchantedMask.Helpers.GlyphHelpers;
 
 namespace EnchantedMask.Glyphs
 {
@@ -29,52 +29,23 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            On.NailSlash.StartSlash += IncreaseNailLength;
+            helper = new MopHelper();
+            helper.Start();
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
-            On.NailSlash.StartSlash -= IncreaseNailLength;
-        }
-
-        /// <summary>
-        /// The Mantis glyph increases the length of nail attacks when MOP is equipped
-        /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        private void IncreaseNailLength(On.NailSlash.orig_StartSlash orig, NailSlash self)
-        {
-            // Get the default scale
-            Vector3 startingScale = self.scale;
-
-            // Increase the scale temporarily, otherwise the effects can/will stack
-            if (PlayerData.instance.equippedCharm_13)
+            if (helper != null)
             {
-                float modifier = GetModifier();
-                Vector3 newScale = new Vector3(startingScale.x * modifier, startingScale.y * modifier);
-                self.scale = newScale;
-                //SharedData.Log($"{ID} - Nail length increased by {modifier}");
+                helper.Stop();
             }
-
-            // Perform the nail slash
-            orig(self);
-            self.scale = startingScale;
         }
 
         /// <summary>
-        /// As an Uncommon glyph, Mantis increases MOP's value by 
-        ///     2 notches, for a total of 5.
-        /// At 3 notches MOP increases nail length by 25%, and at 2 notches
-        ///     Longnail increases it by 15%, so an extra 2 notches would
-        ///     be worth 20%, for a total of 45%.
+        /// Utils helper
         /// </summary>
-        /// <returns></returns>
-        internal override float GetModifier()
-        {
-            // 1.25 * 1.16 = 1.45
-            return 1.16f;
-        }
+        private MopHelper helper;
     }
 }

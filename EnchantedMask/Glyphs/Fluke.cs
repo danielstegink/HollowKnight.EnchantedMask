@@ -1,7 +1,6 @@
-﻿using EnchantedMask.Helpers;
+﻿using DanielSteginkUtils.Helpers.Charms.Dung;
+using DanielSteginkUtils.Helpers.Charms.Pets;
 using EnchantedMask.Settings;
-using Modding;
-using UnityEngine;
 
 namespace EnchantedMask.Glyphs
 {
@@ -22,7 +21,7 @@ namespace EnchantedMask.Glyphs
         {
             if (!PlayerData.instance.flukeMotherDefeated)
             {
-                return "A mother ferociously breeds in a cramped, damp space.";
+                return "A mother ferociously breeds above a pool of acid.";
             }
 
             return base.GetClue();
@@ -32,67 +31,47 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            // d/t = r
-            // To buff dung flukes, we adjust t
-            // d/(xt) = 1.67 * r
-            // x = 1 / 1.67
-            dungFlukeHelper = new DungFlukeHelper(1 / (1 + GetModifier()), Name);
+            flukeHelper = new FlukeHelper(GetModifier());
+            flukeHelper.Start();
+
+            dungFlukeHelper = new DungFlukeHelper(SharedData.modName, Name, 1 / GetModifier());
             dungFlukeHelper.Start();
-            ModHooks.ObjectPoolSpawnHook += BuffFlukes;
         }
 
         public override void Unequip()
         {
             base.Unequip();
 
+            if (flukeHelper != null)
+            {
+                flukeHelper.Stop();
+            }
+
             if (dungFlukeHelper != null)
             {
                 dungFlukeHelper.Stop();
             }
-            ModHooks.ObjectPoolSpawnHook -= BuffFlukes;
         }
 
         /// <summary>
-        /// Used for handling damage buff for Dung Flukes
+        /// Handles damage buff for Flukes
+        /// </summary>
+        private FlukeHelper flukeHelper;
+
+        /// <summary>
+        /// Handles damage buff for Dung Flukes
         /// </summary>
         private DungFlukeHelper dungFlukeHelper;
 
         /// <summary>
-        /// The Fluke glyph increases damage dealt by Flukenest.
-        /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
-        private GameObject BuffFlukes(GameObject gameObject)
-        {
-            if (gameObject.name.StartsWith("Spell Fluke") &&
-                gameObject.name.Contains("Clone"))
-            {
-                // Dung Flukes have to be handled separately
-                if (!gameObject.name.Contains("Dung"))
-                {
-                    SpellFluke fluke = gameObject.GetComponent<SpellFluke>();
-
-                    // Fluke damage is stored in a private variable, so we need to
-                    //  get the field the variable is stored in
-                    int baseDamage = SharedData.GetField<SpellFluke, int>(fluke, "damage");
-                    int bonusDamage = GetBonus(baseDamage);
-
-                    SharedData.SetField(fluke, "damage", baseDamage + bonusDamage);
-                    //SharedData.Log($"{ID} - Damage increased by {bonusDamage}");
-                }
-            }
-
-            return gameObject;
-        }
-
-        /// <summary>
-        /// As an Uncommon glyph, Fluke is worth 2 notches.
-        /// Flukenest uses 3 notches to do what it does, so Fluke should increase its damage by about 67%.
+        /// The Fluke glyph increases the damage dealt by Flukenest
         /// </summary>
         /// <returns></returns>
         internal override float GetModifier()
         {
-            return 2f / 3f;
+            // As an Uncommon glyph, Fluke is worth 2 notches.
+            // Flukenest uses 3 notches, so Fluke should increase its damage by about 67%.
+            return 1f + 2f / 3f;
         }
     }
 }
