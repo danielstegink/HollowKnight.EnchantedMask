@@ -52,8 +52,8 @@ namespace EnchantedMask.Settings
             new Nightmare(),
             new Bound(),
             new Hive(),
-            //new Void(),
-            //new God(),
+            new Void(),
+            new God(),
         };
 
         /// <summary>

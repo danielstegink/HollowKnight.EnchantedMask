@@ -1,5 +1,4 @@
 ﻿using DanielSteginkUtils.Helpers.Charms.Dung;
-using EnchantedMask.Helpers.GlyphHelpers;
 using EnchantedMask.Settings;
 
 namespace EnchantedMask.Glyphs

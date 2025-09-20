@@ -1,10 +1,8 @@
 ﻿using EnchantedMask.Helpers;
-using EnchantedMask.Helpers.GlyphHelpers;
 using EnchantedMask.Helpers.Shop;
 using EnchantedMask.Helpers.UI;
 using EnchantedMask.Settings;
 using Modding;
-using SFCore.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,7 +14,7 @@ namespace EnchantedMask
 {
     public class EnchantedMask : Mod, ILocalSettings<SaveSettings>
     {
-        public override string GetVersion() => "1.2.0.0";
+        public override string GetVersion() => "1.3.0.0";
 
         #region Settings
         public void OnLoadLocal(SaveSettings s)
@@ -43,8 +41,8 @@ namespace EnchantedMask
                 ("Fungus1_04_boss", "Hornet Boss 1/Sphere Ball"),
                 ("GG_Uumuu", "Mega Jellyfish GG"),
                 ("RestingGrounds_08", "Ghost revek"),
-                ("Crossroads_04", "_Enemies/Zombie Hornhead")
-                //("Abyss_06_Core", "Shade Sibling Spawner")
+                ("Crossroads_04", "_Enemies/Zombie Hornhead"),
+                ("Abyss_06_Core", "Shade Sibling Spawner")
             };
         }
 
@@ -68,13 +66,15 @@ namespace EnchantedMask
 
             On.HeroController.Start += OnPlayerDataLoaded;
             On.GameManager.ReturnToMainMenu += OnQuit;
-            
-            // Need to modify the Spell Control FSM on creation so Void can work
-            //On.HeroController.Start += AddVoidSpell;
 
             SharedData.Log("Initialized");
         }
 
+        /// <summary>
+        /// Once the HeroController starts, the player data and save settings will be loaded, so we can set up the glyphs
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
         private void OnPlayerDataLoaded(On.HeroController.orig_Start orig, HeroController self)
         {
             //SharedData.Log("Hero Controller started");
@@ -88,38 +88,20 @@ namespace EnchantedMask
             orig(self);
         }
 
+        /// <summary>
+        /// Some glyphs, like Blessed, modify player data, so we have to reset them all when we close a save file
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="saveMode"></param>
+        /// <param name="callback"></param>
+        /// <returns></returns>
         private IEnumerator OnQuit(On.GameManager.orig_ReturnToMainMenu orig, GameManager self, GameManager.ReturnToMainMenuSaveModes saveMode, Action<bool> callback)
         {
-            // Some glyphs, like Blessed, modify player data, so we have to reset them all
-            // when we close a save file
             IconHelper.ResetGlyphs();
 
             //SharedData.Log("Closing save");
             return orig(self, saveMode, callback);
-        }
-
-        /// <summary>
-        /// Adds the spell from the Void glyph to the FSM so it can be easily added or removed
-        /// </summary>
-        /// <param name="orig"></param>
-        /// <param name="self"></param>
-        /// <exception cref="System.NotImplementedException"></exception>
-        private void AddVoidSpell(On.HeroController.orig_Start orig, HeroController self)
-        {
-            //SharedData.Log($"Adding Abyssal Wraiths to Spell FSM");
-            PlayMakerFSM spellControl = HeroController.instance.spellControl;
-            spellControl.CopyState("Scream Antic2", "EnchantedMask Scream2");
-            spellControl.CopyState("Scream Burst 2", "EnchantedMask Scream2 Burst");
-            spellControl.ChangeTransition("EnchantedMask Scream2", "FINISHED", "EnchantedMask Scream2 Burst");
-
-            spellControl.RemoveAction("EnchantedMask Scream2 Burst", 8);
-            spellControl.RemoveAction("EnchantedMask Scream2 Burst", 7);
-            spellControl.RemoveAction("EnchantedMask Scream2 Burst", 3);
-            spellControl.RemoveAction("EnchantedMask Scream2 Burst", 1);
-            spellControl.RemoveAction("EnchantedMask Scream2 Burst", 0);
-            spellControl.InsertMethod("EnchantedMask Scream2 Burst", () => VoidSpell.AbyssalWraiths(), 0);
-
-            orig(self);
         }
     }
 }

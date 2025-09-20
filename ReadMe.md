@@ -23,6 +23,11 @@ Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs 
 Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
 
 ## Patch Notes
+1.3.0.0
+- Added new glyphs for Godhome
+- Removed faulty clue for Zote glyph
+- Modified clue code in Inventory so that if a glyph is unlocked, the default clue is shown
+
 1.2.0.0
 - Integrated with DanielSteginkUtils
 - Reduced chance of Life triggering

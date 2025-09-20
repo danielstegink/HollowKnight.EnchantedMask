@@ -1,6 +1,5 @@
 ﻿using DanielSteginkUtils.Helpers.Shields;
 using DanielSteginkUtils.Utilities;
-using EnchantedMask.Settings;
 using System.Collections;
 
 namespace EnchantedMask.Helpers.BlockHelpers

@@ -10,6 +10,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using HutongGames.PlayMaker.Actions;
+using EnchantedMask.Glyphs;
 
 namespace EnchantedMask.Helpers.UI.InventoryPage
 {
@@ -711,7 +712,13 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
                     nameBox.GetComponent<TextMeshPro>().text = "???";
                     tierBox.GetComponent<TextMeshPro>().text = "???";
                     tierBox.GetComponent<TextMeshPro>().color = GetColor(Glyphs.Glyph.Tiers.Default);
-                    descriptionBox.GetComponent<TextMeshPro>().text = glyph.GetClue();
+
+                    string clue = new Glyph().GetClue();
+                    if (!glyph.Unlocked())
+                    {
+                        clue = glyph.GetClue();
+                    }
+                    descriptionBox.GetComponent<TextMeshPro>().text = clue;
                 }
             }
         }

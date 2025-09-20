@@ -1,5 +1,6 @@
-﻿using EnchantedMask.Helpers.BlockHelpers;
-using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Helpers.Abilities;
+using DanielSteginkUtils.Utilities;
+using EnchantedMask.Helpers.BlockHelpers;
 using System;
 using System.Collections;
 using UnityEngine;
@@ -70,7 +71,7 @@ namespace EnchantedMask.Glyphs
             base.Equip();
 
             On.HeroController.Move += SpeedBoost;
-            BuffDashCooldown();
+            dashHelper = new DashHelper(GetDashModifier(), GetDashModifier());
             On.HealthManager.TakeDamage += BuffNail;
             On.HealthManager.TakeDamage += BuffSpells;
             godShield.Start();
@@ -81,8 +82,11 @@ namespace EnchantedMask.Glyphs
         {
             base.Unequip();
 
-            ResetDashCooldown();
             On.HeroController.Move -= SpeedBoost;
+            if (dashHelper != null)
+            {
+                dashHelper.Stop();
+            }
             On.HealthManager.TakeDamage -= BuffNail;
             On.HealthManager.TakeDamage -= BuffSpells;
             godShield.Stop();
@@ -113,40 +117,9 @@ namespace EnchantedMask.Glyphs
 
         #region Dash
         /// <summary>
-        /// Tracks whether or not the buff has been applied;
-        /// </summary>
-        private bool dashApplied = false;
-
-        /// <summary>
         /// God glyph reduces the Dash cooldown
         /// </summary>
-        private void BuffDashCooldown()
-        {
-            if (!dashApplied)
-            {
-                float modifier = GetDashModifier();
-                HeroController.instance.DASH_COOLDOWN *= modifier;
-                HeroController.instance.DASH_COOLDOWN_CH *= modifier;
-                HeroController.instance.SHADOW_DASH_COOLDOWN *= modifier;
-                dashApplied = true;
-            }
-        }
-
-        /// <summary>
-        /// Of course, we need to reset the cooldowns when the glyph is removed
-        /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
-        private void ResetDashCooldown()
-        {
-            if (dashApplied)
-            {
-                float modifier = GetDashModifier();
-                HeroController.instance.DASH_COOLDOWN /= modifier;
-                HeroController.instance.DASH_COOLDOWN_CH /= modifier;
-                HeroController.instance.SHADOW_DASH_COOLDOWN /= modifier;
-                dashApplied = false;
-            }
-        }
+        private DashHelper dashHelper;
 
         /// <summary>
         /// God uses 1/2 notch to modify dash cooldown, making it worth 8.25% (1/4 of Dashmaster)
@@ -168,13 +141,9 @@ namespace EnchantedMask.Glyphs
         /// <exception cref="NotImplementedException"></exception>
         private void BuffNail(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
         {
-            bool isNailAttack = SharedData.nailAttackNames.Contains(hitInstance.Source.name) ||
-                               SharedData.nailArtNames.Contains(hitInstance.Source.name) ||
-                               hitInstance.Source.name.Contains("Grubberfly");
-            if (isNailAttack)
+            if (Logic.IsNailAttack(hitInstance))
             {
-                int bonusDamage = GetNailBonus(hitInstance.DamageDealt);
-                hitInstance.DamageDealt += bonusDamage;
+                hitInstance.DamageDealt = Calculations.GetModdedInt(hitInstance.DamageDealt, GetNailModifier());
                 //SharedData.Log($"{ID} - Nail damage increased by {bonusDamage}");
             }
 
@@ -184,11 +153,10 @@ namespace EnchantedMask.Glyphs
         /// <summary>
         /// God uses 1 notch to increase nail damage, making it worth a 10% increase.
         /// </summary>
-        /// <param name="damage"></param>
         /// <returns></returns>
-        private int GetNailBonus(int damage)
+        private float GetNailModifier()
         {
-            return (int)Math.Max(1, damage * 0.1f);
+            return 1.1f;
         }
         #endregion
 
@@ -204,21 +172,19 @@ namespace EnchantedMask.Glyphs
         {
             if (hitInstance.AttackType == AttackTypes.Spell)
             {
-                int bonusDamage = GetSpellBonus(hitInstance.DamageDealt);
-                hitInstance.DamageDealt += bonusDamage;
+                hitInstance.DamageDealt += Calculations.GetModdedInt(hitInstance.DamageDealt, GetSpellModifier());
             }
 
             orig(self, hitInstance);
         }
 
         /// <summary>
-        /// God uses 1 notch to increase spell damage, making it worth 15% (1/3 Shaman Stone)
+        /// God uses 1 notch to increase spell damage, making it worth 16.67% (1/3 Shaman Stone)
         /// </summary>
-        /// <param name="damage"></param>
         /// <returns></returns>
-        private int GetSpellBonus(int damage)
+        private float GetSpellModifier()
         {
-            return (int)Math.Max(1, damage * 0.15f);
+            return 1 + (0.5f / 3f);
         }
         #endregion
 

@@ -46,27 +46,27 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Sorcery
  - Uncommon
  - Unlocked by defeating the Soul Master
- - Increases damage dealt by spells by 50%
+ - Increases damage dealt by spells by 33%
 
 ## Glyph of Honour
  - Uncommon
  - Unlocked by defeating the Dung Defender
- - Doubles the size of size of clouds created by Defender's Crest
+ - Doubles the size of clouds created by Defender's Crest
 
 ## Glyph of Crystals
  - Common
  - Unlocked by defeating the Enraged Guardian
- - Increases Crystal Heat damage by 50% of nail damage
+ - Increases Crystal Heart damage by 50% of nail damage
 
 ## Glyph of Dreams
  - Uncommon
  - Unlocked by listening to the Seer's last words
- - Dream Nail deals roughly 75 damage in exchange for 2 Essence
+ - Dream Nail deals roughly 73 damage in exchange for 2 Essence
 
 ## Glyph of Greed
  - Common
  - Unlocked by defeating the Gorgeous Husk
- - Increases geo gained by 5-100%
+ - Increases geo gained by 5% - 100%
 
 ## Broken Glyph
  - Uncommon
@@ -86,7 +86,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Life
  - Common
  - Unlocked by earning Lifeblood Core
- - 30% chance of gaining a Lifeblood mask after healing. Equipping Lifeblood charms increases this chance by 2-9%.
+ - 30% chance of gaining a Lifeblood mask after healing. Equipping Lifeblood charms increases this chance by 2% - 9%.
 
 ## Glyph of Motherhood
  - Uncommon
@@ -116,7 +116,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Unn
  - Common
  - Unlocked by earning Shape of Unn
- - Increases movement speed while healing with Shape of Unn by 50%. Equipping Spore Shroom and/or Baldur Shell will increase speed by 5-15%.
+ - Increases movement speed while healing with Shape of Unn by 50%. Equipping Spore Shroom and/or Baldur Shell will increase speed by 5% - 15%.
 
 ## Glyph of the Fool
  - Epic
@@ -147,7 +147,7 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
 ## Glyph of Darkness
  - Common
  - Unlocked by earning Void Heart
- - Increases damage dealt with Sharp Shadow by 50%
+ - Increases damage dealt with Sharp Shadow by 50% of nail damage
 
 ## Glyph of Light
  - Epic
@@ -184,3 +184,18 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
  - Rare
  - Unlocked by defeating Hive Knight
  - 37% chance to heal an additional Mask when Hiveblood is equipped
+
+ ## Glyph of Destruction
+ - Legendary
+ - Unlocked by completing all challenges in the Hall of the Gods
+ - Doubles all damage taken, but increases all damage dealt dependent on max health (87% at 9 masks)
+
+ ## Glyph of the Godseekers
+ - Legendary
+ - Unlocked by getting the Weathered Mask
+ - Increases movement speed by 10%
+ - Reduces Dash and Shadow Dash cooldowns by 8%
+ - Increases nail damage by 10%
+ - Increases spell damage by 16%
+ - 7% chance of negating damage
+ - Passively generates 1 SOUL every 2.5 seconds

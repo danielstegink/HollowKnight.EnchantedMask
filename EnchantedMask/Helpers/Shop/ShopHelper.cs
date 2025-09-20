@@ -32,7 +32,7 @@ namespace EnchantedMask.Helpers.Shop
         /// </summary>
         private static void BuildItemChanger()
         {
-            SharedData.Log("Adding glyphs and shop to ItemChanger");
+            //SharedData.Log("Adding glyphs and shop to ItemChanger");
 
             // Add Mask Maker's shop
             CustomShopLocation maskShop = new CustomShopLocation()
@@ -77,7 +77,7 @@ namespace EnchantedMask.Helpers.Shop
         /// <param name="arg1"></param>
         private static void StockStore(Scene arg0, LoadSceneMode arg1)
         {
-            SharedData.Log("Stocking store");
+            //SharedData.Log("Stocking store");
 
             // Need to initialize the settings so the placements save properly
             ItemChangerMod.CreateSettingsProfile(false, false);

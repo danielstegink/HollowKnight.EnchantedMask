@@ -1,9 +1,6 @@
-﻿using EnchantedMask.Helpers.GlyphHelpers;
-using EnchantedMask.Settings;
+﻿using DanielSteginkUtils.Utilities;
 using GlobalEnums;
-using Satchel;
-using System.Collections;
-using System.Collections.Generic;
+using System;
 using UnityEngine;
 
 namespace EnchantedMask.Glyphs
@@ -13,13 +10,13 @@ namespace EnchantedMask.Glyphs
         public override string ID => "Void";
         public override string Name => "Glyph of Destruction";
         public override Tiers Tier => Tiers.Legendary;
-        public override string Description => "The symbol of the master of darkness and destruction.\n\n" +
-                                                "Transforms the Howling Wraiths spell into a team of deadly Siblings.";
+        public override string Description => "The symbol of the god of darkness.\n\n" +
+                                                "Envelops the bearer in Void, increasing the damage they deal while also increasing the damage they take.";
 
         public override bool Unlocked()
         {
             return PlayerData.instance.screamLevel == 2 &&
-                    PlayerData.instance.killedVoidIdol_1;
+                    PlayerData.instance.killedVoidIdol_3;
         }
 
         public override string GetClue()
@@ -32,7 +29,7 @@ namespace EnchantedMask.Glyphs
             {
                 return "A colony of pilgrims attune themselves while buried in garbage.";
             }
-            else if (!PlayerData.instance.killedVoidIdol_1)
+            else if (!PlayerData.instance.killedVoidIdol_3)
             {
                 return "There are gods who sit undefeated in their hall.";
             }
@@ -44,37 +41,67 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            AddSpell();
-            GameManager.instance.StartCoroutine(VoidSpell.SiblingMovement());
+            On.HeroController.TakeDamage += TakeDoubleDamage;
+            On.HealthManager.TakeDamage += BuffDamage;
         }
 
         public override void Unequip()
         {
             base.Unequip();
-
-            RemoveSpell();
+            On.HeroController.TakeDamage -= TakeDoubleDamage;
+            On.HealthManager.TakeDamage -= BuffDamage;
         }
 
         /// <summary>
-        /// Void replaces Shriek with a new spell, Abyssal Wraiths
+        /// The Void glyph causes the player to take double damage
         /// </summary>
-        private void AddSpell()
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="go"></param>
+        /// <param name="damageSide"></param>
+        /// <param name="damageAmount"></param>
+        /// <param name="hazardType"></param>
+        private void TakeDoubleDamage(On.HeroController.orig_TakeDamage orig, HeroController self, GameObject go, CollisionSide damageSide, int damageAmount, int hazardType)
         {
-            PlayMakerFSM spellControl = HeroController.instance.spellControl;
-            spellControl.ChangeTransition("Level Check 3", "LEVEL 2", "EnchantedMask Scream2");
+            damageAmount *= 2;
+            orig(self, go, damageSide, damageAmount, hazardType);
         }
 
         /// <summary>
-        /// Resets the Spell Control FSM when the glyph is removed
+        /// The Void glyph increases damage the player deals
         /// </summary>
-        private void RemoveSpell()
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        /// <param name="hitInstance"></param>
+        /// <exception cref="NotImplementedException"></exception>
+        private void BuffDamage(On.HealthManager.orig_TakeDamage orig, HealthManager self, HitInstance hitInstance)
         {
-            try
-            {
-                PlayMakerFSM spellControl = HeroController.instance.spellControl;
-                spellControl.ChangeTransition("Level Check 3", "LEVEL 2", "Scream Antic2");
-            }
-            catch { } // Possible that the hero controller won't be fully initialized yet
-        }        
+            int baseDamage = hitInstance.DamageDealt;
+            int bonusDamage = GetBonus(baseDamage);
+            hitInstance.DamageDealt += bonusDamage;
+            //SharedData.Log($"{ID} - {baseDamage} damage increased by {bonusDamage}");
+
+            orig(self, hitInstance);
+        }
+
+        /// <summary>
+        /// Gets the damage modifier
+        /// </summary>
+        /// <returns></returns>
+        internal override float GetModifier()
+        {
+            // As a Legendary glyph, Void is worth 5 notches
+            int notchValue = 5;
+            // However, we also take double damage, which is like having half the usual health
+            float maxHealth = PlayerData.instance.GetInt("maxHealth");
+            int healthLost = (int)Math.Floor(maxHealth / 2);
+            // Per my Utils, 1 health is worth 2 notches
+            notchValue += (int)(NotchCosts.NotchesPerMask() * healthLost);
+
+            // Per my Utils, 1 notch is worth a 6.67% increase in all damage dealt, which comes out to about 87% at the default max 9 health
+            float modifier = notchValue * NotchCosts.DamagePerNotch();
+            //SharedData.Log($"{ID} - Total health: {maxHealth}, Total notches: {notchValue}, Damage modifier: {modifier}");
+            return modifier;
+        }
     }
 }

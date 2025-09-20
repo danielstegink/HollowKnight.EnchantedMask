@@ -31,10 +31,6 @@ namespace EnchantedMask.Glyphs
             {
                 return "A self-proclaimed Knight is trapped in darkness and thread.";
             }
-            else if (!PlayerData.instance.zoteSpokenColosseum)
-            {
-                return "A self-proclaimed Knight is once again trapped, this time caged by Fools.";
-            }
             else if (!PlayerData.instance.zoteDefeated)
             {
                 return "A self-proclaimed Knight tests his might in a grand arena.";
