@@ -737,7 +737,7 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
                 case Glyphs.Glyph.Tiers.Uncommon:
                     return new Color(0, 255, 0); // Green
                 case Glyphs.Glyph.Tiers.Rare:
-                    return new Color(0, 0, 255); // Blue
+                    return new Color(0, 50, 255); // Blue
                 case Glyphs.Glyph.Tiers.Epic:
                     return new Color(255, 0, 255); // Purple
                 case Glyphs.Glyph.Tiers.Legendary:

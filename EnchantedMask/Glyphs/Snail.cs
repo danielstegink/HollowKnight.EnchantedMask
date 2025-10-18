@@ -1,4 +1,5 @@
 ﻿using DanielSteginkUtils.Utilities;
+using EnchantedMask.Settings;
 using System.Collections;
 using UnityEngine;
 
@@ -78,8 +79,9 @@ namespace EnchantedMask.Glyphs
                 // Per my Utils, 1 notch is worth 1 SOUL every 2.5 seconds
                 // So Snail will give 1 SOUL every 1.25 seconds
                 HeroController.instance.AddMPCharge(1);
-                yield return new WaitForSeconds(NotchCosts.PassiveSoulTime() / 2);
-                //SharedData.Log($"{ID} - 1 SOUL added");
+                float time = NotchCosts.PassiveSoulTime() / 2;
+                //SharedData.Log($"{ID} - 1 SOUL added. Waiting {time} seconds");
+                yield return new WaitForSeconds(time);
             }
         }
     }

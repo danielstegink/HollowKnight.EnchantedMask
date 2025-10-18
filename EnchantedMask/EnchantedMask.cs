@@ -14,7 +14,7 @@ namespace EnchantedMask
 {
     public class EnchantedMask : Mod, ILocalSettings<SaveSettings>
     {
-        public override string GetVersion() => "1.3.0.0";
+        public override string GetVersion() => "1.4.0.0";
 
         #region Settings
         public void OnLoadLocal(SaveSettings s)

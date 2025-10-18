@@ -20,9 +20,14 @@ You can find a detailed list of each glyph, its abilities, and how to get it in 
 Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs from one's inventory.
 
 ## Thanks
+Special thank you to MsGreen419 for their phenomenal work on the new glyph icons introduced in version 1.4
+
 Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
 
 ## Patch Notes
+1.4.0.0
+- Icons improved by MsGreen419
+
 1.3.0.0
 - Added new glyphs for Godhome
 - Removed faulty clue for Zote glyph
