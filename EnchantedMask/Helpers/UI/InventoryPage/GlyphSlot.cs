@@ -7,15 +7,17 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
     /// </summary>
     public class GlyphSlot
     {
-        public readonly GameObject slotOjbect;
+        public readonly GameObject slotObject;
         public readonly GameObject icon;
         public readonly SpriteRenderer spriteRenderer;
+        public readonly GameObject halo;
 
-        public GlyphSlot(GameObject slotOjbect, GameObject icon, SpriteRenderer spriteRenderer)
+        public GlyphSlot(GameObject slotObject, GameObject icon, SpriteRenderer spriteRenderer, GameObject halo)
         {
-            this.slotOjbect = slotOjbect;
+            this.slotObject = slotObject;
             this.icon = icon;
             this.spriteRenderer = spriteRenderer;
+            this.halo = halo;
         }
     }
 }

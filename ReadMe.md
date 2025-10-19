@@ -27,6 +27,7 @@ Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
 ## Patch Notes
 1.4.0.0
 - Icons improved by MsGreen419
+- Added new color-coded haloes that show which glyph is currently equipped
 
 1.3.0.0
 - Added new glyphs for Godhome

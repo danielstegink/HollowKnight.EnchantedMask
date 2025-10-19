@@ -1,16 +1,18 @@
-﻿using HutongGames.PlayMaker;
+﻿using EnchantedMask.Glyphs;
+using EnchantedMask.Settings;
+using HutongGames.PlayMaker;
+using HutongGames.PlayMaker.Actions;
 using ItemChanger.Extensions;
 using ItemChanger.FsmStateActions;
-using EnchantedMask.Settings;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.EnterpriseServices.CompensatingResourceManager;
 using System.Linq;
 using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using HutongGames.PlayMaker.Actions;
-using EnchantedMask.Glyphs;
 
 namespace EnchantedMask.Helpers.UI.InventoryPage
 {
@@ -232,13 +234,46 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
                 icon.layer = glyphsPage.layer;
 
                 // Decides what the icon looks like
-                SpriteRenderer sr = icon.AddComponent<SpriteRenderer>();
-                sr.sprite = SharedData.glyphs[i].GetIcon();
-                sr.sortingLayerID = 629535577;
-                sr.sortingLayerName = "HUD";
+                SpriteRenderer spriteRenderer = icon.AddComponent<SpriteRenderer>();
+                spriteRenderer.sprite = SharedData.glyphs[i].GetIcon();
+                spriteRenderer.sortingLayerID = 629535577;
+                spriteRenderer.sortingLayerName = "HUD";
 
-                slots[rowIndex].Add(new GlyphSlot(slotObject, icon, sr));
+                // Add the background halo to show if a slot is equipped
+                GameObject equippedHalo = new GameObject($"Glyph Slot {i} - Halo");
+                equippedHalo.transform.SetParent(icon.transform);
+                equippedHalo.layer = icon.layer;
+                equippedHalo.transform.localPosition = new Vector3(0, 0, 5);
+                equippedHalo.transform.localScale = 1.5f * spacing.Scale();
+
+                // Define the halo's appearance
+                SpriteRenderer spriteRenderer2 = equippedHalo.AddComponent<SpriteRenderer>();
+                spriteRenderer2.sprite = GetHaloSprite(SharedData.glyphs[i].Tier);
+                spriteRenderer2.sortingLayerID = 629535577;
+                spriteRenderer2.sortingLayerName = "HUD";
+                equippedHalo.SetActive(false);
+
+                slots[rowIndex].Add(new GlyphSlot(slotObject, icon, spriteRenderer, equippedHalo));
                 columnIndex++;
+            }
+        }
+
+        private Sprite GetHaloSprite(Glyph.Tiers tier)
+        {
+            switch (tier)
+            {
+                case Glyph.Tiers.Common:
+                    return SpriteHelper.GetSprite("WhiteHalo");
+                case Glyph.Tiers.Uncommon:
+                    return SpriteHelper.GetSprite("GreenHalo");
+                    case Glyph.Tiers.Rare:
+                    return SpriteHelper.GetSprite("BlueHalo");
+                case Glyph.Tiers.Epic:
+                    return SpriteHelper.GetSprite("PurpleHalo");
+                case Glyph.Tiers.Legendary:
+                    return SpriteHelper.GetSprite("YellowHalo");
+                default:
+                    return SpriteHelper.GetSprite("WhiteHalo");
             }
         }
 
@@ -275,6 +310,7 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
                     Glyphs.Glyph glyph = SharedData.glyphs[GetGlyphIndex(rowIndex, columnIndex)];
 
                     slot.spriteRenderer.sprite = glyph.Bought() ? glyph.GetIcon() : hiddenSprite;
+                    slot.halo.SetActive(glyph.IsEquipped());
                 }
             }
         }
@@ -653,7 +689,7 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
             selectedColumn = int.Parse(stateParts[2]);
 
             PlayMakerFSM updateCursor = pageFsm.gameObject.LocateMyFSM("Update Cursor");
-            updateCursor.FsmVariables.FindFsmGameObject("Item").Value = slots[selectedRow][selectedColumn].slotOjbect;
+            updateCursor.FsmVariables.FindFsmGameObject("Item").Value = slots[selectedRow][selectedColumn].slotObject;
             updateCursor.SendEvent("UPDATE CURSOR");
 
             SetSelectedGlyph(stateName);
@@ -728,22 +764,22 @@ namespace EnchantedMask.Helpers.UI.InventoryPage
         /// </summary>
         /// <param name="tier"></param>
         /// <returns></returns>
-        private Color GetColor(Glyphs.Glyph.Tiers tier)
+        private UnityEngine.Color GetColor(Glyphs.Glyph.Tiers tier)
         {
             switch (tier)
             {
                 case Glyphs.Glyph.Tiers.Common:
-                    return new Color(255, 255, 255); // White
+                    return new UnityEngine.Color(255, 255, 255); // White
                 case Glyphs.Glyph.Tiers.Uncommon:
-                    return new Color(0, 255, 0); // Green
+                    return new UnityEngine.Color(0, 255, 0); // Green
                 case Glyphs.Glyph.Tiers.Rare:
-                    return new Color(0, 50, 255); // Blue
+                    return new UnityEngine.Color(0, 50, 255); // Blue
                 case Glyphs.Glyph.Tiers.Epic:
-                    return new Color(255, 0, 255); // Purple
+                    return new UnityEngine.Color(255, 0, 255); // Purple
                 case Glyphs.Glyph.Tiers.Legendary:
-                    return new Color(255, 255, 0); // Yellow
+                    return new UnityEngine.Color(255, 255, 0); // Yellow
                 default:
-                    return new Color(255, 255, 255); // White
+                    return new UnityEngine.Color(255, 255, 255); // White
             }
         }
         #endregion
