@@ -25,6 +25,9 @@ Special thank you to MsGreen419 for their phenomenal work on the new glyph icons
 Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
 
 ## Patch Notes
+1.4.1.0
+- Code improvements to reduce data load and improve compatibility with HKMP
+
 1.4.0.0
 - Icons improved by MsGreen419
 - Added new color-coded haloes that show which glyph is currently equipped

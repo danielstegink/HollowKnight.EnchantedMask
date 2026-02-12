@@ -33,7 +33,7 @@ namespace EnchantedMask.Helpers.UI
         {
             ModHooks.GetPlayerBoolHook += GetBools;
             ModHooks.LanguageGetHook += GetText;
-            On.HeroController.Update += UpdateInventoryPage;
+            On.HeroController.CanOpenInventory += UpdateInventoryPage;
         }
 
         /// <summary>
@@ -75,10 +75,10 @@ namespace EnchantedMask.Helpers.UI
         /// <param name="orig"></param>
         /// <param name="self"></param>
         /// <exception cref="NotImplementedException"></exception>
-        private static void UpdateInventoryPage(On.HeroController.orig_Update orig, HeroController self)
+        private static bool UpdateInventoryPage(On.HeroController.orig_CanOpenInventory orig, HeroController self)
         {
-            orig(self);
             GlyphsPage.instance.UpdatePage();
+            return orig(self);
         }
     }
 }

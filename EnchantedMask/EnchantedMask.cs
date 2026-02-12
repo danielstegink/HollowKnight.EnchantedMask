@@ -14,7 +14,7 @@ namespace EnchantedMask
 {
     public class EnchantedMask : Mod, ILocalSettings<SaveSettings>
     {
-        public override string GetVersion() => "1.4.0.0";
+        public override string GetVersion() => "1.4.1.0";
 
         #region Settings
         public void OnLoadLocal(SaveSettings s)
@@ -40,9 +40,7 @@ namespace EnchantedMask
             {
                 ("Fungus1_04_boss", "Hornet Boss 1/Sphere Ball"),
                 ("GG_Uumuu", "Mega Jellyfish GG"),
-                ("RestingGrounds_08", "Ghost revek"),
                 ("Crossroads_04", "_Enemies/Zombie Hornhead"),
-                ("Abyss_06_Core", "Shade Sibling Spawner")
             };
         }
 

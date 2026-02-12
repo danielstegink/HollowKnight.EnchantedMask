@@ -3,6 +3,7 @@ using DanielSteginkUtils.Utilities;
 using EnchantedMask.Helpers.BlockHelpers;
 using System;
 using System.Collections;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace EnchantedMask.Glyphs
@@ -71,11 +72,17 @@ namespace EnchantedMask.Glyphs
             base.Equip();
 
             On.HeroController.Move += SpeedBoost;
+
             dashHelper = new DashHelper(GetDashModifier(), GetDashModifier());
+
             On.HealthManager.TakeDamage += BuffNail;
+
             On.HealthManager.TakeDamage += BuffSpells;
+
             godShield.Start();
-            GameManager.instance.StartCoroutine(GiveSoul());
+
+            soulTimer.Restart();
+            On.HeroController.Update += GiveSoul;
         }
 
         public override void Unequip()
@@ -83,13 +90,20 @@ namespace EnchantedMask.Glyphs
             base.Unequip();
 
             On.HeroController.Move -= SpeedBoost;
+
             if (dashHelper != null)
             {
                 dashHelper.Stop();
             }
+
             On.HealthManager.TakeDamage -= BuffNail;
+
             On.HealthManager.TakeDamage -= BuffSpells;
+
             godShield.Stop();
+
+            soulTimer.Stop();
+            On.HeroController.Update -= GiveSoul;
         }
 
         #region Speed
@@ -193,18 +207,25 @@ namespace EnchantedMask.Glyphs
         /// </summary>
         private GodShield godShield = new GodShield();
 
+        #region Soul
+        Stopwatch soulTimer = new Stopwatch();
+
         /// <summary>
         /// God gives SOUL passively over time.
         /// God uses 1 notch, so it gives 1 SOUL every 2.5 seconds.
         /// </summary>
-        /// <returns></returns>
-        private IEnumerator GiveSoul()
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        private void GiveSoul(On.HeroController.orig_Update orig, HeroController self)
         {
-            while (IsEquipped())
+            orig(self);
+
+            if (soulTimer.ElapsedMilliseconds >= 1000 * NotchCosts.PassiveSoulTime())
             {
                 HeroController.instance.AddMPCharge(1);
-                yield return new WaitForSeconds(2.5f);
+                soulTimer.Restart();
             }
         }
+        #endregion
     }
 }

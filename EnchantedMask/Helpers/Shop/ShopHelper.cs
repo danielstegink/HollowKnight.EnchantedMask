@@ -88,7 +88,7 @@ namespace EnchantedMask.Helpers.Shop
 
             // Find all the glyphs that have been unlocked but not bought, and add them to the shop
             List<Glyph> glyphsToStock = SharedData.glyphs.Where(x => x.Unlocked() &&
-                                                                !x.Bought())
+                                                                    !x.Bought())
                                                          .ToList();
             foreach (Glyph glyph in glyphsToStock)
             {
