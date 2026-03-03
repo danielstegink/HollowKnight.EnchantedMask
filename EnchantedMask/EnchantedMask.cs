@@ -9,12 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using SaveSettings = EnchantedMask.Settings.SaveSettings;
+using EnchantedMask.Glyphs;
+using System.Diagnostics;
 
 namespace EnchantedMask
 {
     public class EnchantedMask : Mod, ILocalSettings<SaveSettings>
     {
-        public override string GetVersion() => "1.4.1.0";
+        public override string GetVersion() => "1.5.0.0";
 
         #region Settings
         public void OnLoadLocal(SaveSettings s)
@@ -41,6 +43,7 @@ namespace EnchantedMask
                 ("Fungus1_04_boss", "Hornet Boss 1/Sphere Ball"),
                 ("GG_Uumuu", "Mega Jellyfish GG"),
                 ("Crossroads_04", "_Enemies/Zombie Hornhead"),
+                ("White_Palace_06", "wp_saw (3)")
             };
         }
 
@@ -49,6 +52,8 @@ namespace EnchantedMask
             SharedData.Log("Initializing");
 
             SharedData.preloads = preloadedObjects;
+
+            SharedData.paleCourtMod = ModHooks.GetMod("Pale Court");
 
             SharedData.Log("Running helpers");
             ShopHelper.Run();
@@ -64,6 +69,7 @@ namespace EnchantedMask
 
             On.HeroController.Start += OnPlayerDataLoaded;
             On.GameManager.ReturnToMainMenu += OnQuit;
+            On.HeroController.Update += OnUpdate;
 
             SharedData.Log("Initialized");
         }
@@ -75,15 +81,36 @@ namespace EnchantedMask
         /// <param name="self"></param>
         private void OnPlayerDataLoaded(On.HeroController.orig_Start orig, HeroController self)
         {
+            orig(self);
+
             //SharedData.Log("Hero Controller started");
+            AddCustomFireball();
+
             if (!string.IsNullOrWhiteSpace(SharedData.saveSettings.EquippedGlyph))
             {
                 Glyphs.Glyph glyph = SharedData.glyphs.Where(x => x.ID.Equals(SharedData.saveSettings.EquippedGlyph))
                                                         .First();
                 glyph.Equip();
             }
+        }
 
-            orig(self);
+        /// <summary>
+        /// Adds states and actions so that Champion can replace Vengeful Spirit
+        /// </summary>
+        private void AddCustomFireball()
+        {
+            // First, we need to make 2 new states to replace Vengeful Spirit and Shade Soul
+            PlayMakerFSM spellControl = HeroController.instance.spellControl;
+            Satchel.FsmUtil.CopyState(spellControl, "Fireball 1", Champion.level1State);
+            Satchel.FsmUtil.CopyState(spellControl, "Fireball 2", Champion.level2State);
+
+            // Then, we need to replace the code in the new custom states
+            Satchel.FsmUtil.RemoveAction(spellControl, Champion.level1State, 3);
+            Satchel.FsmUtil.RemoveAction(spellControl, Champion.level2State, 3);
+            Satchel.FsmUtil.InsertCustomAction(spellControl, Champion.level1State, () => Champion.ShootSaw(false), 3);
+            Satchel.FsmUtil.InsertCustomAction(spellControl, Champion.level2State, () => Champion.ShootSaw(true), 3);
+
+            //SharedData.Log("FSM ready for modification");
         }
 
         /// <summary>
@@ -100,6 +127,35 @@ namespace EnchantedMask
 
             //SharedData.Log("Closing save");
             return orig(self, saveMode, callback);
+        }
+
+        /// <summary>
+        /// Need to periodically check the Champions saws for deletion, but
+        /// avoid coroutines to mitigate data usage
+        /// </summary>
+        /// <param name="orig"></param>
+        /// <param name="self"></param>
+        private void OnUpdate(On.HeroController.orig_Update orig, HeroController self)
+        {
+            orig(self);
+
+            List<Tuple<GameObject, Stopwatch>> saws = new List<Tuple<GameObject, Stopwatch>>();
+            while (Champion.clones.Count > 0)
+            {
+                saws.Add(Champion.clones.Dequeue());
+            }
+
+            foreach (Tuple<GameObject, Stopwatch> saw in saws)
+            {
+                if (saw.Item2.ElapsedMilliseconds > 5000)
+                {
+                    UnityEngine.GameObject.Destroy(saw.Item1);
+                }
+                else
+                {
+                    Champion.clones.Enqueue(saw);
+                }
+            }
         }
     }
 }

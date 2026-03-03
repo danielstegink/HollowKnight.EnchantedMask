@@ -1,15 +1,26 @@
 ﻿using EnchantedMask.Glyphs;
+using Modding;
 using System.Collections.Generic;
-using System.Reflection;
 using UnityEngine;
 
 namespace EnchantedMask.Settings
 {
     public static class SharedData
     {
+        /// <summary>
+        /// Name of the mod (passed to helpers for logging purposes)
+        /// </summary>
         public static string modName = "EnchantedMask";
 
+        /// <summary>
+        /// Save settings for the mod
+        /// </summary>
         public static SaveSettings saveSettings { get; set; } = new SaveSettings();
+
+        /// <summary>
+        /// Stores the PC mod for ease of reference
+        /// </summary>
+        public static IMod paleCourtMod;
 
         /// <summary>
         /// List of all the masks in the game
@@ -54,6 +65,8 @@ namespace EnchantedMask.Settings
             new Hive(),
             new Void(),
             new God(),
+            new Abyss(),
+            new Champion(),
         };
 
         /// <summary>
@@ -65,6 +78,9 @@ namespace EnchantedMask.Settings
             Modding.Logger.Log($"[EnchantedMask] {message}");
         }
 
+        /// <summary>
+        /// Stored preloaded objects for ease of reference
+        /// </summary>
         public static Dictionary<string, Dictionary<string, GameObject>> preloads;
 
         #region GameObject Names

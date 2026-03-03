@@ -237,3 +237,19 @@ This file contains a list of all glyphs, their statistics, and how to unlock the
  - Increases spell damage by 16%
  - 7% chance of negating damage
  - Passively generates 1 SOUL every 2.5 seconds
+
+# Pale Court Glyphs
+
+ ## Glyph of the Abyss
+![Abyss](https://github.com/danielstegink/HollowKnight.EnchantedMask/blob/main/EnchantedMask/Resources/Glyphs/Abyss.png?raw=true)
+ - Legendary
+ - Unlocked by acquiring the Abyssal Bloom charm
+ - Reduces Shade Cloak cooldown by 50%, and enables mid-air repeated dashing
+
+  ## Glyph of Champions
+![Champion](https://github.com/danielstegink/HollowKnight.EnchantedMask/blob/main/EnchantedMask/Resources/Glyphs/Champion.png?raw=true)
+ - Legendary
+ - Unlocked by completing the Champion's Call
+ - Replaces the Vengeful Spirit spell with a new spell that summons buzzsaws
+ - Has synergies with Shaman Stone and Flukenest
+ - Requires reset when loading a save (see Readme for details)

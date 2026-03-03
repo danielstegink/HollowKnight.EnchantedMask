@@ -69,8 +69,8 @@ namespace EnchantedMask.Glyphs
         /// <returns></returns>
         internal override float GetModifier()
         {
-            // As an Uncommon glyph, Fluke is worth 2 notches.
-            // Flukenest uses 3 notches, so Fluke should increase its damage by about 67%.
+            // As an Uncommon glyph, Fluke is worth 2 notches
+            // Flukenest uses 3 notches, so Fluke should increase its damage by about 67%
             return 1f + 2f / 3f;
         }
     }

@@ -1,30 +1,51 @@
 # Enchanted Mask
-Inspired by Lost Artifacts, this mod adds a whole new type of power to the game: Glyphs. 
-As you traverse the game, you will unlock different glyphs which can be purchased from the Map Maker. 
-You can only equip 1 glyph at a time, which will display as an icon in the top-left corner of your screen.
+Inspired by Lost Artifacts, this mod adds a whole new type
+of power to the game: Glyphs. As you traverse the game, 
+you will unlock different glyphs which can be purchased 
+from the Map Maker. You can only equip 1 glyph at a time, 
+which will display as an icon in the top-left corner of 
+your screen.
 
-Each glyph has been assigned a tier based on how difficult it is to unlock. Higher-tier glyphs are more expensive and more powerful. 
+Each glyph has been assigned a tier based on how difficult
+it is to unlock. Higher-tier glyphs are more expensive and
+more powerful. 
  - Common glyphs are the easiest to unlock. They cost 500 geo and are as powerful as 1-notch charms.
  - Uncommon glyphs are a little harder, roughly mid-game difficulty. They cost 1000 geo and are as powerful as 2-notch charms.
  - Rare glyphs are challenging, generally acquired in late game. They cost 2000 geo and are as powerful as 3-notch charms.
  - Epic glyphs are end-game difficulty. They cost 4000 geo and are as powerful as 4-notch charms.
  - Legendary glyphs are considered the greatest challenges in the game. They cost 8000 geo and are as powerful as 5-notch charms.
 
-The Glyphs page in your inventory will show all the glyphs you've acquired. 
-The logic for equipping/unequipping a glyph is the same as that of charms. A sound effect will play each time.
-Each one will display its name, tier, and a description. 
-If a glyph hasn't been unlocked, the description will provide a clue regarding how to unlock it.
+The Glyphs page in your inventory will show all the glyphs
+you've acquired. The logic for equipping/unequipping a 
+glyph is the same as that of charms. A sound effect will 
+play each time. Each one will display its name, tier, and 
+a description. If a glyph hasn't been unlocked, the 
+description will provide a clue regarding how to unlock 
+it.
 
-You can find a detailed list of each glyph, its abilities, and how to get it in the SPOILERS file.
+You can find a detailed list of each glyph, its abilities,
+and how to get it in the SPOILERS file.
 
-Additionally, the mod is has a sub-menu in Debug Mod for adding/removing glyphs from one's inventory.
+Additionally, the mod is has a sub-menu in Debug Mod for 
+adding/removing glyphs from one's inventory.
+
+## Warnings
+The Glyph of Champions clashes with Pale Court upon 
+loading a save. You will have to unequip/re-equip it to
+benefit from its effects.
 
 ## Thanks
-Special thank you to MsGreen419 for their phenomenal work on the new glyph icons introduced in version 1.4
+Special thank you to MsGreen419 for their phenomenal work 
+on the new glyph icons introduced in version 1.4
 
-Thank you Hadanelith, BenjaLP211 and Dwarfwoot for testing and feedback.
+Thank you Hadanelith, BenjaLP211 and Dwarfwoot for 
+testing and feedback.
 
 ## Patch Notes
+1.5.0.0
+- Added new glyphs for Pale Court
+- Minor (likely invisible) code improvements
+
 1.4.1.0
 - Code improvements to reduce data load and improve compatibility with HKMP
 

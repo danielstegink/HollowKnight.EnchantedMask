@@ -44,7 +44,6 @@ namespace EnchantedMask.Glyphs
 
             if (dashHelper != null)
             {
-                dashHelper = new DashHelper(GetModifier(), GetModifier());
                 dashHelper.Stop();
             }
         }
