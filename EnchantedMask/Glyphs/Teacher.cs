@@ -39,7 +39,10 @@ namespace EnchantedMask.Glyphs
         {
             base.Equip();
 
-            CreatePrefab();
+            if (prefab == null)
+            {
+                CreatePrefab();
+            }
             GameManager.instance.StartCoroutine(SpawnLumaflies());
         }
 

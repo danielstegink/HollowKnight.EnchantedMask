@@ -42,6 +42,10 @@ Thank you Hadanelith, BenjaLP211 and Dwarfwoot for
 testing and feedback.
 
 ## Patch Notes
+1.5.1.0
+- Fixed damage stacking bug for Teacher glyph
+- Improved Protection glyph background efficiency
+
 1.5.0.0
 - Added new glyphs for Pale Court
 - Minor (likely invisible) code improvements

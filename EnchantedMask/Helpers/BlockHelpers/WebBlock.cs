@@ -2,7 +2,6 @@
 using DanielSteginkUtils.Utilities;
 using EnchantedMask.Settings;
 using GlobalEnums;
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -36,7 +35,10 @@ namespace EnchantedMask.Helpers.BlockHelpers
 
         public override void Start()
         {
-            InitializeWebShield();
+            if (prefab == null)
+            {
+                InitializeWebShield();
+            }
 
             base.Start();
         }
